@@ -1,5 +1,53 @@
 # @nhost/stripe-graphql-js
 
+## 1.2.0
+
+### Minor Changes
+
+- 768ca17: chore: update dependencies
+
+## 1.1.1
+
+### Patch Changes
+
+- 7789469: chore: address linter errors and remove unnecessary imports
+
+## 1.1.0
+
+### Minor Changes
+
+- 49a80c2: chore: update dependencies
+
+## 1.0.7
+
+### Patch Changes
+
+- e5bab6a: chore: update dependencies
+
+## 1.0.6
+
+### Patch Changes
+
+- 8d91f71: chore: update deps and enable pnpm audit
+
+## 1.0.5
+
+### Patch Changes
+
+- 45759c4d4: fix(stripe-graphql-js): fix stripe GraphQL extension export issue in serverless functions
+
+## 1.0.4
+
+### Patch Changes
+
+- 07a45fde0: chore(deps): bump `graphql` to `v16.7.1`
+
+## 1.0.3
+
+### Patch Changes
+
+- da03bf39: chore(build): change build target to ES2019
+
 ## 1.0.2
 
 ### Patch Changes

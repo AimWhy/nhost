@@ -8,9 +8,14 @@ module.exports = {
     tsconfigRootDir: __dirname,
     project: './tsconfig.json',
   },
-  ignorePatterns: ['**/.eslintrc.js', '**/prettier.config.js'],
+  ignorePatterns: [
+    '**/.eslintrc.js',
+    '**/prettier.config.js',
+    '**/next.config.js',
+  ],
   rules: {
     'react/react-in-jsx-scope': 'off',
+    'react/prop-types': [2, { ignore: ['className'] }],
     'react/jsx-props-no-spreading': 'off',
     'react/require-default-props': 'off',
     'react-hooks/exhaustive-deps': 'warn',
@@ -21,9 +26,9 @@ module.exports = {
       'error',
       { allowArrowFunctions: true, allowFunctions: true },
     ],
+    'import/prefer-default-export': 'off',
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     curly: ['error', 'all'],
-    'no-restricted-exports': 'off',
     'no-undef': 'off',
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': [
@@ -62,24 +67,39 @@ module.exports = {
           {
             group: ['..*'],
             message:
-              'Please use absolute imports instead. (e.g: @/ui/, @/hooks/, etc.)',
-          },
-          {
-            group: ['@/components/ui', '@/components/ui/*'],
-            message:
-              'Please use shorthand imports instead. (e.g: @/ui/ActivityIndicator, @/ui/Button, etc.)',
-          },
-          {
-            group: ['@/components/ui/v2*'],
-            message:
-              'Please use shorthand imports instead. (e.g: @/ui/v2/ActivityIndicator, @/ui/v2/Button, etc.)',
+              'Please use absolute imports instead. (e.g: @/components/, @/hooks/, etc.)',
           },
           {
             group: ['@testing-library/react*'],
-            message: 'Please use @/utils/testUtils instead.',
+            message: 'Please use @/tests/testUtils instead.',
           },
         ],
       },
     ],
   },
+  overrides: [
+    {
+      files: ['**/components/ui/v3/*.tsx'],
+      rules: {
+        'react/prop-types': [
+          2,
+          {
+            ignore: [
+              'className',
+              'align',
+              'sideOffset',
+              'orientation',
+              'decorative',
+              'checked',
+              'position',
+            ],
+          },
+        ],
+        'react-refresh/only-export-components': 'off',
+        'react/function-component-definition': 'off',
+        'arrow-body-style': 'off',
+        'react/no-unknown-property': 'off',
+      },
+    },
+  ],
 };

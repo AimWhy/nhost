@@ -1,5 +1,64 @@
 # @nhost-examples/serverless-functions
 
+## 0.2.0
+
+### Minor Changes
+
+- 768ca17: chore: update dependencies
+
+### Patch Changes
+
+- Updated dependencies [768ca17]
+  - @nhost/stripe-graphql-js@1.2.0
+
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [7789469]
+  - @nhost/stripe-graphql-js@1.1.1
+
+## 0.1.0
+
+### Minor Changes
+
+- 49a80c2: chore: update dependencies
+
+### Patch Changes
+
+- Updated dependencies [49a80c2]
+  - @nhost/stripe-graphql-js@1.1.0
+
+## 0.0.11
+
+### Patch Changes
+
+- 8c34c69: chore: update nodemailer version to `6.9.9`
+- Updated dependencies [e5bab6a]
+  - @nhost/stripe-graphql-js@1.0.7
+
+## 0.0.10
+
+### Patch Changes
+
+- 8d91f71: chore: update deps and enable pnpm audit
+- Updated dependencies [8d91f71]
+  - @nhost/stripe-graphql-js@1.0.6
+
+## 0.0.9
+
+### Patch Changes
+
+- 45759c4d4: fix(stripe-graphql-js): fix stripe GraphQL extension export issue in serverless functions
+- Updated dependencies [45759c4d4]
+  - @nhost/stripe-graphql-js@1.0.5
+
+## 0.0.8
+
+### Patch Changes
+
+- aa3c62989: chore(cli): bump Nhost CLI version to v1.0
+
 ## 0.0.7
 
 ### Patch Changes

@@ -1,33 +1,39 @@
-import Container from '@/components/layout/Container';
-import SettingsLayout from '@/components/settings/SettingsLayout';
-import AnonymousSignInSettings from '@/components/settings/signInMethods/AnonymousSignInSettings';
-import AppleProviderSettings from '@/components/settings/signInMethods/AppleProviderSettings';
-import DiscordProviderSettings from '@/components/settings/signInMethods/DiscordProviderSettings';
-import EmailAndPasswordSettings from '@/components/settings/signInMethods/EmailAndPasswordSettings';
-import FacebookProviderSettings from '@/components/settings/signInMethods/FacebookProviderSettings';
-import GitHubProviderSettings from '@/components/settings/signInMethods/GitHubProviderSettings';
-import GoogleProviderSettings from '@/components/settings/signInMethods/GoogleProviderSettings';
-import LinkedInProviderSettings from '@/components/settings/signInMethods/LinkedInProviderSettings';
-import MagicLinkSettings from '@/components/settings/signInMethods/MagicLinkSettings';
-import ProvidersUpdatedAlert from '@/components/settings/signInMethods/ProvidersUpdatedAlert';
-import SMSSettings from '@/components/settings/signInMethods/SMSSettings';
-import SpotifyProviderSettings from '@/components/settings/signInMethods/SpotifyProviderSettings';
-import TwitchProviderSettings from '@/components/settings/signInMethods/TwitchProviderSettings';
-import TwitterProviderSettings from '@/components/settings/signInMethods/TwitterProviderSettings';
-import WebAuthnSettings from '@/components/settings/signInMethods/WebAuthnSettings';
-import WindowsLiveProviderSettings from '@/components/settings/signInMethods/WindowsLiveProviderSettings';
-import WorkOsProviderSettings from '@/components/settings/signInMethods/WorkOsProviderSettings';
+import { Container } from '@/components/layout/Container';
+import { SettingsLayout } from '@/components/layout/SettingsLayout';
+import { ActivityIndicator } from '@/components/ui/v2/ActivityIndicator';
+import { AnonymousSignInSettings } from '@/features/authentication/settings/components/AnonymousSignInSettings';
+import { AppleProviderSettings } from '@/features/authentication/settings/components/AppleProviderSettings';
+import { AzureADProviderSettings } from '@/features/authentication/settings/components/AzureADProviderSettings';
+import { DiscordProviderSettings } from '@/features/authentication/settings/components/DiscordProviderSettings';
+import { EmailAndPasswordSettings } from '@/features/authentication/settings/components/EmailAndPasswordSettings';
+import { FacebookProviderSettings } from '@/features/authentication/settings/components/FacebookProviderSettings';
+import { GitHubProviderSettings } from '@/features/authentication/settings/components/GitHubProviderSettings';
+import { GoogleProviderSettings } from '@/features/authentication/settings/components/GoogleProviderSettings';
+import { LinkedInProviderSettings } from '@/features/authentication/settings/components/LinkedInProviderSettings';
+import { MagicLinkSettings } from '@/features/authentication/settings/components/MagicLinkSettings';
+import { SMSSettings } from '@/features/authentication/settings/components/SMSSettings';
+import { SpotifyProviderSettings } from '@/features/authentication/settings/components/SpotifyProviderSettings';
+import { TwitchProviderSettings } from '@/features/authentication/settings/components/TwitchProviderSettings';
+import { TwitterProviderSettings } from '@/features/authentication/settings/components/TwitterProviderSettings';
+import { WebAuthnSettings } from '@/features/authentication/settings/components/WebAuthnSettings';
+import { WindowsLiveProviderSettings } from '@/features/authentication/settings/components/WindowsLiveProviderSettings';
+import { WorkOsProviderSettings } from '@/features/authentication/settings/components/WorkOsProviderSettings';
+import { ProjectLayout } from '@/features/orgs/layout/ProjectLayout';
+import { useCurrentWorkspaceAndProject } from '@/features/projects/common/hooks/useCurrentWorkspaceAndProject';
+import { useIsPlatform } from '@/features/projects/common/hooks/useIsPlatform';
 import { useGetSignInMethodsQuery } from '@/generated/graphql';
-import { useCurrentWorkspaceAndApplication } from '@/hooks/useCurrentWorkspaceAndApplication';
-import ActivityIndicator from '@/ui/v2/ActivityIndicator';
+import { useLocalMimirClient } from '@/hooks/useLocalMimirClient';
 import type { ReactElement } from 'react';
 
 export default function SettingsSignInMethodsPage() {
-  const { currentApplication } = useCurrentWorkspaceAndApplication();
+  const isPlatform = useIsPlatform();
+  const localMimirClient = useLocalMimirClient();
+  const { currentProject } = useCurrentWorkspaceAndProject();
 
   const { loading, error } = useGetSignInMethodsQuery({
-    variables: { appId: currentApplication?.id },
+    variables: { appId: currentProject?.id },
     fetchPolicy: 'network-only',
+    ...(!isPlatform ? { client: localMimirClient } : {}),
   });
 
   if (loading) {
@@ -54,8 +60,8 @@ export default function SettingsSignInMethodsPage() {
       <WebAuthnSettings />
       <AnonymousSignInSettings />
       <SMSSettings />
-      {!currentApplication.providersUpdated && <ProvidersUpdatedAlert />}
       <AppleProviderSettings />
+      <AzureADProviderSettings />
       <DiscordProviderSettings />
       <FacebookProviderSettings />
       <GitHubProviderSettings />
@@ -71,5 +77,17 @@ export default function SettingsSignInMethodsPage() {
 }
 
 SettingsSignInMethodsPage.getLayout = function getLayout(page: ReactElement) {
-  return <SettingsLayout>{page}</SettingsLayout>;
+  return (
+    <ProjectLayout
+      mainContainerProps={{
+        className: 'flex h-full',
+      }}
+    >
+      <SettingsLayout>
+        <Container sx={{ backgroundColor: 'background.default' }}>
+          {page}
+        </Container>
+      </SettingsLayout>
+    </ProjectLayout>
+  );
 };

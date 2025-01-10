@@ -18,23 +18,23 @@
     "noImplicitAny": false,
     "baseUrl": "./src",
     "useUnknownInCatchVariables": false,
+    "types": ["@types/ace"],
     "paths": {
+      "@/*": ["./*"],
+      "@/tests/*": ["tests/*"],
+      "@/e2e/*": ["../e2e/*"],
       "@/components/*": ["components/*"],
       "@/hooks/*": ["hooks/*"],
       "@/utils/*": ["utils/*"],
-      "@/lib/*": ["lib/*"],
       "@/types/*": ["types/*"],
-      "@/css/*": ["css/*"],
       "@/styles/*": ["styles/*"],
       "@/data/*": ["data/*"],
-      "@/context/*": ["context/*"],
-      "@/theme/*": ["theme/*"],
       "@/generated/*": ["utils/__generated__/*"],
-      "@/ui/*": ["components/ui/*"],
-      "@/ui": ["components/ui/index.ts"]
+      "@/features/*": ["features/*"],
+      "@/hypertune/*": ["hypertune/*"]
     },
     "incremental": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", ".nhost", "nhost", "functions"]
+  "exclude": ["node_modules", ".nhost", "nhost", "functions", "playwright.config.ts"]
 }

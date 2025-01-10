@@ -5,5 +5,7 @@ packages:
   - 'docs'
   - '!**/test/**'
   - '!out/**'
-  - 'examples/**'
+  - 'examples/*'
+  - 'templates/**'
+  - 'examples/quickstarts/*'
   - '!**/functions'

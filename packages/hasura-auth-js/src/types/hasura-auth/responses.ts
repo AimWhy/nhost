@@ -1,13 +1,13 @@
-import { ErrorPayload, NhostSession } from './common'
+import { AuthErrorPayload, NhostSession } from './common'
 
 // Hasura-auth API response types
 export interface NullableErrorResponse {
-  error: ErrorPayload | null
+  error: AuthErrorPayload | null
 }
 
 /** session payload from common hasura-auth responses */
 export type NhostSessionResponse =
-  | { session: null; error: ErrorPayload }
+  | { session: null; error: AuthErrorPayload }
   | { session: NhostSession | null; error: null }
 
 /** payload from hasura-auth endpoint /signin/email-password */
@@ -16,7 +16,7 @@ export interface SignInResponse {
   mfa: {
     ticket: string
   } | null
-  error: ErrorPayload | null
+  error: AuthErrorPayload | null
 }
 
 /** payload from hasura-auth endpoint /signup/email-password */
@@ -52,8 +52,19 @@ export interface PasswordlessSmsResponse extends NullableErrorResponse {}
 /** payload from hasura-auth endpoint /signin/anonymous */
 export type SignInAnonymousResponse = NhostSessionResponse
 
+/** payload from hasura-auth endpoint /signin/pat */
+export type SignInPATResponse = NhostSessionResponse
+
 /** payload from hasura-auth endpoint /signin/anonymous */
 export type PasswordlessSmsOtpResponse = NhostSessionResponse
 
+/** payload from hasura-auth endpoint /signin/otp/email */
+export interface SignInEmailOTPResponse extends NullableErrorResponse {}
+
+/** payload from hasura-auth endpoint /signin/otp/email/verify */
+export type VerifyEmailOTPResponse = NhostSessionResponse
+
 /** payload from hasura-auth endpoint /signin/mfa/totp */
 export type SignInMfaTotpResponse = NhostSessionResponse
+
+export type ConnectProviderResponse = { providerUrl?: string }

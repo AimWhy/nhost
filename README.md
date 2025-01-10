@@ -15,6 +15,8 @@
 <a href="https://twitter.com/nhost">Twitter</a>
 <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
 <a href="https://nhost.io/discord">Discord</a>
+<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+<a href="https://gurubase.io/g/nhost">Ask Nhost Guru (third party, unofficial)</a>
 <br />
 
   <hr />
@@ -34,7 +36,7 @@ Nhost consists of open source software:
 - Authentication: [Hasura Auth](https://github.com/nhost/hasura-auth/)
 - Storage: [Hasura Storage](https://github.com/nhost/hasura-storage)
 - Serverless Functions: Node.js (JavaScript and TypeScript)
-- [Nhost CLI](https://docs.nhost.io/reference/cli) for local development
+- [Nhost CLI](https://docs.nhost.io/cli) for local development
 
 ## Architecture of Nhost
 
@@ -97,7 +99,7 @@ Nhost is frontend agnostic, which means Nhost works with all frontend frameworks
 
 # Resources
 
-- Start developing locally with the [Nhost CLI](https://docs.nhost.io/reference/cli)
+- Start developing locally with the [Nhost CLI](https://docs.nhost.io/cli)
 
 ## Nhost Clients
 

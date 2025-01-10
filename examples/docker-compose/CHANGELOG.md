@@ -1,5 +1,47 @@
 # @nhost-examples/docker-compose
 
+## 0.4.0
+
+### Minor Changes
+
+- 768ca17: chore: update dependencies
+
+## 0.3.0
+
+### Minor Changes
+
+- e40a452: chore: clarification on greyed-out options in the dashboard when self-hosting
+
+## 0.2.0
+
+### Minor Changes
+
+- 49a80c2: chore: update dependencies
+
+## 0.1.1
+
+### Patch Changes
+
+- aff059e: fix: timers
+
+## 0.1.0
+
+### Minor Changes
+
+- ed9df85: updated docker-compose.yaml and .env-example
+
+## 0.0.7
+
+### Patch Changes
+
+- 8d91f71: chore: update deps and enable pnpm audit
+
+## 0.0.6
+
+### Patch Changes
+
+- a1c5c97a5: Clarify instructions for running the Nhost dashboard with Docker Compose
+
 ## 0.0.5
 
 ### Patch Changes
