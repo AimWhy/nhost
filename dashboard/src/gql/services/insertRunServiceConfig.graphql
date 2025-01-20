@@ -1,0 +1,11 @@
+mutation InsertRunServiceConfig(
+  $appID: uuid!
+  $config: ConfigRunServiceConfigInsertInput!
+) {
+  insertRunServiceConfig(appID: $appID, config: $config) {
+    serviceID
+    config {
+      name
+    }
+  }
+}

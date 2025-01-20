@@ -6,14 +6,14 @@ import {
 import { postFetch } from '..'
 import { CodifiedError } from '../errors'
 import { AuthClient } from '../internal-client'
-import { ErrorPayload, SecurityKey } from '../types'
-import { ActionErrorState, ActionLoadingState, ActionSuccessState } from './types'
+import { AuthErrorPayload, SecurityKey } from '../types'
+import { AuthActionErrorState, AuthActionLoadingState, AuthActionSuccessState } from './types'
 
-export interface AddSecurityKeyHandlerResult extends ActionErrorState, ActionSuccessState {
+export interface AddSecurityKeyHandlerResult extends AuthActionErrorState, AuthActionSuccessState {
   key?: SecurityKey
 }
 
-export interface AddSecurityKeyState extends AddSecurityKeyHandlerResult, ActionLoadingState {}
+export interface AddSecurityKeyState extends AddSecurityKeyHandlerResult, AuthActionLoadingState {}
 
 export const addSecurityKeyPromise = async (
   { backendUrl, interpreter }: AuthClient,
@@ -21,7 +21,7 @@ export const addSecurityKeyPromise = async (
 ): Promise<AddSecurityKeyHandlerResult> => {
   try {
     const { data: options } = await postFetch<PublicKeyCredentialCreationOptionsJSON>(
-      '/user/webauthn/add',
+      `${backendUrl}/user/webauthn/add`,
       {},
       interpreter?.getSnapshot().context.accessToken.value
     )
@@ -38,7 +38,7 @@ export const addSecurityKeyPromise = async (
     )
     return { key, isError: false, error: null, isSuccess: true }
   } catch (e) {
-    const { error } = e as { error: ErrorPayload }
+    const { error } = e as { error: AuthErrorPayload }
     return { isError: true, error, isSuccess: false }
   }
 }

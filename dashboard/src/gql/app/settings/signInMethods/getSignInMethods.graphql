@@ -1,5 +1,5 @@
 query GetSignInMethods($appId: uuid!) {
-  config(appID: $appId, resolve: true) {
+  config(appID: $appId, resolve: false) {
     id: __typename
     __typename
     provider {
@@ -16,9 +16,15 @@ query GetSignInMethods($appId: uuid!) {
       id: __typename
       __typename
       method {
+        otp {
+          email {
+            enabled
+          }
+        }
         emailPassword {
           emailVerificationRequired
           hibpEnabled
+          passwordMinLength
         }
         emailPasswordless {
           enabled
@@ -39,6 +45,24 @@ query GetSignInMethods($appId: uuid!) {
             keyId
             teamId
             privateKey
+            audience
+          }
+          bitbucket {
+            enabled
+            clientId
+            clientSecret
+          }
+          gitlab {
+            enabled
+            clientId
+            clientSecret
+            scope
+          }
+          strava {
+            enabled
+            clientId
+            clientSecret
+            scope
           }
           discord {
             enabled
@@ -63,6 +87,7 @@ query GetSignInMethods($appId: uuid!) {
             clientId
             clientSecret
             scope
+            audience
           }
           linkedin {
             enabled
@@ -99,6 +124,12 @@ query GetSignInMethods($appId: uuid!) {
             clientSecret
             connection
             organization
+          }
+          azuread {
+            enabled
+            clientId
+            clientSecret
+            tenant
           }
         }
       }

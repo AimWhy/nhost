@@ -1,10 +1,12 @@
-import { LoadingScreen } from '@/components/common/LoadingScreen';
-import RetryableErrorBoundary from '@/components/common/RetryableErrorBoundary';
-import DataBrowserGrid from '@/components/dataBrowser/DataBrowserGrid';
-import DataBrowserLayout from '@/components/dataBrowser/DataBrowserLayout';
-import useIsPlatform from '@/hooks/common/useIsPlatform';
-import { useCurrentWorkspaceAndApplication } from '@/hooks/useCurrentWorkspaceAndApplication';
-import useTablePath from '@/hooks/useTablePath';
+import { LoadingScreen } from '@/components/presentational/LoadingScreen';
+import { RetryableErrorBoundary } from '@/components/presentational/RetryableErrorBoundary';
+import { Box } from '@/components/ui/v2/Box';
+import { useTablePath } from '@/features/database/common/hooks/useTablePath';
+import { DataBrowserGrid } from '@/features/database/dataGrid/components/DataBrowserGrid';
+import { DataBrowserSidebar } from '@/features/database/dataGrid/components/DataBrowserSidebar';
+import { ProjectLayout } from '@/features/orgs/layout/ProjectLayout';
+import { useCurrentWorkspaceAndProject } from '@/features/projects/common/hooks/useCurrentWorkspaceAndProject';
+import { useIsPlatform } from '@/features/projects/common/hooks/useIsPlatform';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import type { SortingRule } from 'react-table';
@@ -12,7 +14,7 @@ import type { SortingRule } from 'react-table';
 export default function DataBrowserTableDetailsPage() {
   const isPlatform = useIsPlatform();
   const tablePath = useTablePath();
-  const { currentApplication } = useCurrentWorkspaceAndApplication();
+  const { currentProject } = useCurrentWorkspaceAndProject();
 
   const [sortBy, setSortBy] = useState<SortingRule<any>[]>();
 
@@ -24,7 +26,7 @@ export default function DataBrowserTableDetailsPage() {
     setSortBy(undefined);
   }, [tablePath]);
 
-  if (isPlatform && !currentApplication?.config?.hasura.adminSecret) {
+  if (isPlatform && !currentProject?.config?.hasura.adminSecret) {
     return <LoadingScreen />;
   }
 
@@ -36,5 +38,20 @@ export default function DataBrowserTableDetailsPage() {
 }
 
 DataBrowserTableDetailsPage.getLayout = function getLayout(page: ReactElement) {
-  return <DataBrowserLayout>{page}</DataBrowserLayout>;
+  return (
+    <ProjectLayout
+      mainContainerProps={{
+        className: 'flex h-full',
+      }}
+    >
+      <DataBrowserSidebar className="w-full max-w-sidebar" />
+
+      <Box
+        className="flex w-full flex-auto flex-col overflow-x-hidden"
+        sx={{ backgroundColor: 'background.default' }}
+      >
+        {page}
+      </Box>
+    </ProjectLayout>
+  );
 };

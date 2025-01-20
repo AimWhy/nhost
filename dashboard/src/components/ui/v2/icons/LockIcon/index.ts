@@ -1,1 +1,1 @@
-export { default } from './LockIcon';
+export { default as LockIcon } from './LockIcon';

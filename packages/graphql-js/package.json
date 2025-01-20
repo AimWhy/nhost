@@ -1,6 +1,6 @@
 {
   "name": "@nhost/graphql-js",
-  "version": "0.0.3",
+  "version": "0.3.0",
   "description": "Nhost GraphQL client",
   "license": "MIT",
   "keywords": [
@@ -28,6 +28,7 @@
     "./package.json": "./package.json",
     ".": {
       "import": {
+        "types": "./dist/index.d.ts",
         "node": "./dist/index.cjs.js",
         "default": "./dist/index.esm.js"
       },
@@ -52,14 +53,17 @@
     "docgen": "pnpm typedoc && docgen --config ./graphql.docgen.json"
   },
   "dependencies": {
-    "@graphql-typed-document-node/core": "^3.1.1",
-    "cross-fetch": "^3.1.5"
+    "@graphql-typed-document-node/core": "^3.2.0",
+    "base-64": "^1.0.0",
+    "isomorphic-unfetch": "^3.1.0",
+    "jwt-decode": "^4.0.0"
   },
   "peerDependencies": {
     "graphql": "^14.0.0 || ^15.0.0 || ^16.0.0"
   },
   "devDependencies": {
     "@nhost/docgen": "workspace:*",
-    "graphql": "16.6.0"
+    "@types/base-64": "^1.0.2",
+    "graphql": "16.8.1"
   }
 }

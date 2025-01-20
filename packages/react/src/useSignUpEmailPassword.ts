@@ -1,7 +1,8 @@
 import {
   signUpEmailPasswordPromise,
   SignUpEmailPasswordState,
-  SignUpOptions
+  SignUpOptions,
+  RequestOptions
 } from '@nhost/nhost-js'
 import { useSelector } from '@xstate/react'
 import { useAuthInterpreter } from './useAuthInterpreter'
@@ -12,7 +13,8 @@ interface SignUpEmailPasswordHandler {
   (
     email: string,
     password: string,
-    options?: SignUpOptions
+    options?: SignUpOptions,
+    requestOptions?: RequestOptions
   ): Promise<SignUpEmailPasswordHandlerResult>
 }
 
@@ -69,8 +71,9 @@ export const useSignUpEmailPassword: SignUpEmailPasswordHook = (options) => {
   const signUpEmailPassword: SignUpEmailPasswordHandler = (
     email,
     password,
-    valueOptions = options
-  ) => signUpEmailPasswordPromise(service, email, password as string, valueOptions)
+    valueOptions = options,
+    requestOptions
+  ) => signUpEmailPasswordPromise(service, email, password as string, valueOptions, requestOptions)
 
   const user = useSelector(
     service,
@@ -79,8 +82,11 @@ export const useSignUpEmailPassword: SignUpEmailPasswordHook = (options) => {
   )
   const accessToken = useSelector(service, (state) => state.context.accessToken.value)
 
+  const refreshToken = useSelector(service, (state) => state.context.refreshToken.value)
+
   return {
     accessToken,
+    refreshToken,
     error,
     isError,
     isLoading,

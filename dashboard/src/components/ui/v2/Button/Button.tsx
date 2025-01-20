@@ -1,4 +1,4 @@
-import ActivityIndicator from '@/ui/v2/ActivityIndicator';
+import { ActivityIndicator } from '@/components/ui/v2/ActivityIndicator';
 import type { SxProps, Theme } from '@mui/material';
 import { alpha, styled } from '@mui/material';
 import type {
@@ -141,6 +141,7 @@ const ContainedButton = forwardRef(
           backgroundColor: 'error.dark',
         },
         '&:focus': {
+          backgroundColor: 'error.main',
           boxShadow: (theme) =>
             `0 0 0 2px ${alpha(theme.palette.error.main, 0.3)}`,
         },

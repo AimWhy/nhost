@@ -1,6 +1,7 @@
 import {
   AuthMachine,
   NhostClient,
+  NhostReactClientConstructorParams,
   NhostSession,
   NHOST_REFRESH_TOKEN_KEY,
   VanillaNhostClient
@@ -11,21 +12,28 @@ import { StateFrom } from 'xstate'
 import { waitFor } from 'xstate/lib/waitFor'
 import { NHOST_SESSION_KEY } from './utils'
 
+export type CreateServerSideClientParams = Partial<
+  Pick<
+    NhostReactClientConstructorParams,
+    'subdomain' | 'region' | 'authUrl' | 'functionsUrl' | 'graphqlUrl' | 'storageUrl'
+  >
+>
+
 /**
  * Creates an Nhost client that runs on the server side.
  * It will try to get the refesh token in cookies, or from the request URL
  * If a refresh token is found, it uses it to get an up to date access token (JWT) and a user session
  * This method resolves when the authentication status is known eventually
- * @param backendUrl
- * @param context
+ * @param config - An object containing connection information
+ * @param context - Server side context
  * @returns instance of `NhostClient` that is ready to use on the server side (signed in or signed out)
  */
 export const createServerSideClient = async (
-  backendUrl: string,
+  params: CreateServerSideClientParams,
   context: GetServerSidePropsContext
 ): Promise<NhostClient> => {
   const nhost = new VanillaNhostClient({
-    backendUrl,
+    ...params,
     clientStorageType: 'custom',
     clientStorage: {
       getItem: (key) => {

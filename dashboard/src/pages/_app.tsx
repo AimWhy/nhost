@@ -1,16 +1,22 @@
-import DialogProvider from '@/components/common/DialogProvider/DialogProvider';
-import ErrorBoundaryFallback from '@/components/common/ErrorBoundaryFallback';
-import { ManagedUIContext } from '@/context/UIContext';
-import { WorkspaceProvider } from '@/context/workspace-context';
-import { UserDataProvider } from '@/context/workspace1-context';
-import useIsPlatform from '@/hooks/common/useIsPlatform';
+import { DialogProvider } from '@/components/common/DialogProvider';
+import { UIProvider } from '@/components/common/UIProvider';
+import { TreeNavStateProvider } from '@/components/layout/MainNav/TreeNavStateContext';
+import { RetryableErrorBoundary } from '@/components/presentational/RetryableErrorBoundary';
+import { ThemeProvider } from '@/components/ui/v2/ThemeProvider';
+import { TooltipProvider } from '@/components/ui/v3/tooltip';
+import { useIsPlatform } from '@/features/projects/common/hooks/useIsPlatform';
+// eslint-disable-next-line import/extensions
 import '@/styles/fonts.css';
+// eslint-disable-next-line import/extensions
+import '@/styles/github-dark.css';
+// eslint-disable-next-line import/extensions
 import '@/styles/globals.css';
+// eslint-disable-next-line import/extensions
 import '@/styles/graphiql.min.css';
+// eslint-disable-next-line import/extensions
 import '@/styles/style.css';
-import ThemeProvider from '@/ui/v2/ThemeProvider';
-import { COLOR_PREFERENCE_STORAGE_KEY } from '@/utils/CONSTANTS';
-import createEmotionCache from '@/utils/createEmotionCache';
+import { COLOR_PREFERENCE_STORAGE_KEY } from '@/utils/constants/common';
+import { createEmotionCache } from '@/utils/createEmotionCache';
 import { nhost } from '@/utils/nhost';
 import type { EmotionCache } from '@emotion/react';
 import { CacheProvider } from '@emotion/react';
@@ -25,14 +31,15 @@ import { NhostApolloProvider } from '@nhost/react-apollo';
 import * as snippet from '@segment/snippet';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { NextPage } from 'next';
+import { PagesProgressBar as ProgressBar } from 'next-nprogress-bar';
 import { DefaultSeo } from 'next-seo';
 import type { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import type { ReactElement } from 'react';
 import { useEffect } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
 import { Toaster } from 'react-hot-toast';
+import { RecoilRoot } from 'recoil';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -83,44 +90,51 @@ function MyApp({
   const getLayout = Component.getLayout ?? ((page: ReactElement) => page);
 
   return (
-    <ErrorBoundary fallbackRender={ErrorBoundaryFallback}>
+    <QueryClientProvider client={queryClient}>
       <DefaultSeo titleTemplate="%s - Nhost" defaultTitle="Nhost" />
 
-      <QueryClientProvider client={queryClient}>
-        <CacheProvider value={emotionCache}>
-          <NhostProvider nhost={nhost}>
-            <NhostApolloProvider
-              fetchPolicy="cache-first"
-              nhost={nhost}
-              connectToDevTools={process.env.NEXT_PUBLIC_ENV === 'dev'}
-            >
-              <WorkspaceProvider>
-                <UserDataProvider>
-                  <ManagedUIContext>
-                    <Toaster position="bottom-center" />
+      <CacheProvider value={emotionCache}>
+        <NhostProvider nhost={nhost}>
+          <NhostApolloProvider
+            fetchPolicy="cache-and-network"
+            nhost={nhost}
+            connectToDevTools={process.env.NEXT_PUBLIC_ENV === 'dev'}
+          >
+            <UIProvider>
+              <Toaster position="bottom-center" />
 
-                    {isPlatform && (
-                      <Script
-                        id="segment"
-                        dangerouslySetInnerHTML={{ __html: renderSnippet() }}
-                      />
-                    )}
+              {isPlatform && (
+                <Script
+                  id="segment"
+                  dangerouslySetInnerHTML={{ __html: renderSnippet() }}
+                />
+              )}
 
-                    <ThemeProvider
-                      colorPreferenceStorageKey={COLOR_PREFERENCE_STORAGE_KEY}
-                    >
+              <ThemeProvider
+                colorPreferenceStorageKey={COLOR_PREFERENCE_STORAGE_KEY}
+              >
+                <RetryableErrorBoundary>
+                  <RecoilRoot>
+                    <TooltipProvider>
                       <DialogProvider>
-                        {getLayout(<Component {...pageProps} />)}
+                        <ProgressBar
+                          height="2px"
+                          color="#0052cd"
+                          options={{ showSpinner: false }}
+                        />
+                        <TreeNavStateProvider>
+                          {getLayout(<Component {...pageProps} />)}
+                        </TreeNavStateProvider>
                       </DialogProvider>
-                    </ThemeProvider>
-                  </ManagedUIContext>
-                </UserDataProvider>
-              </WorkspaceProvider>
-            </NhostApolloProvider>
-          </NhostProvider>
-        </CacheProvider>
-      </QueryClientProvider>
-    </ErrorBoundary>
+                    </TooltipProvider>
+                  </RecoilRoot>
+                </RetryableErrorBoundary>
+              </ThemeProvider>
+            </UIProvider>
+          </NhostApolloProvider>
+        </NhostProvider>
+      </CacheProvider>
+    </QueryClientProvider>
   );
 }
 export default MyApp;

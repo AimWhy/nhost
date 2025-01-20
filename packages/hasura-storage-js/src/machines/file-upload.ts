@@ -1,12 +1,19 @@
-import FormData from 'form-data'
 import { assign, createMachine } from 'xstate'
-import { ErrorPayload, FileUploadConfig } from '../utils'
+import { FileUploadConfig, StorageErrorPayload } from '../utils'
 import { fetchUpload } from '../utils/upload'
+
+import FallbackFormData from 'form-data'
+
+let FormData: any
+
+if (typeof FormData === 'undefined') {
+  FormData = FallbackFormData
+}
 
 export type FileUploadContext = {
   progress: number | null
   loaded: number
-  error: ErrorPayload | null
+  error: StorageErrorPayload | null
   id?: string
   bucketId?: string
   file?: File
@@ -24,7 +31,7 @@ export type FileUploadEvents =
     } & FileUploadConfig)
   | { type: 'UPLOAD_PROGRESS'; progress: number; loaded: number; additions: number }
   | { type: 'UPLOAD_DONE'; id: string; bucketId: string }
-  | { type: 'UPLOAD_ERROR'; error: ErrorPayload }
+  | { type: 'UPLOAD_ERROR'; error: StorageErrorPayload }
   | { type: 'CANCEL' }
   | { type: 'DESTROY' }
 
@@ -118,7 +125,7 @@ export const createFileUploadMachine = () =>
         uploadFile: (context, event) => (callback) => {
           const file = (event.file || context.file)!
           const data = new FormData()
-          data.append('file', file)
+          data.append('file[]', file)
 
           let currentLoaded = 0
 
@@ -143,8 +150,14 @@ export const createFileUploadMachine = () =>
             if (error) {
               callback({ type: 'UPLOAD_ERROR', error })
             }
-            if (fileMetadata) {
+            if (fileMetadata && !('processedFiles' in fileMetadata)) {
               const { id, bucketId } = fileMetadata
+              callback({ type: 'UPLOAD_DONE', id, bucketId })
+            }
+
+            if (fileMetadata && 'processedFiles' in fileMetadata) {
+              // TODO: Add support for multiple files
+              const { id, bucketId } = fileMetadata.processedFiles[0]
               callback({ type: 'UPLOAD_DONE', id, bucketId })
             }
           })

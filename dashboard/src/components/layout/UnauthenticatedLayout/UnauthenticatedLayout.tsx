@@ -1,12 +1,11 @@
-import { LoadingScreen } from '@/components/common/LoadingScreen';
-import RetryableErrorBoundary from '@/components/common/RetryableErrorBoundary';
 import type { BaseLayoutProps } from '@/components/layout/BaseLayout';
-import BaseLayout from '@/components/layout/BaseLayout';
-import Container from '@/components/layout/Container';
-import useIsPlatform from '@/hooks/common/useIsPlatform';
-import { useCleanWorkspaceContext } from '@/hooks/use-cleanWorkspaceContext';
-import Box from '@/ui/v2/Box';
-import ThemeProvider from '@/ui/v2/ThemeProvider';
+import { BaseLayout } from '@/components/layout/BaseLayout';
+import { Container } from '@/components/layout/Container';
+import { LoadingScreen } from '@/components/presentational/LoadingScreen';
+import { RetryableErrorBoundary } from '@/components/presentational/RetryableErrorBoundary';
+import { Box } from '@/components/ui/v2/Box';
+import { ThemeProvider } from '@/components/ui/v2/ThemeProvider';
+import { useIsPlatform } from '@/features/projects/common/hooks/useIsPlatform';
 import GlobalStyles from '@mui/material/GlobalStyles';
 import { useAuthenticationStatus } from '@nhost/nextjs';
 import Image from 'next/image';
@@ -22,24 +21,22 @@ export default function UnauthenticatedLayout({
   const router = useRouter();
   const isPlatform = useIsPlatform();
   const { isAuthenticated, isLoading } = useAuthenticationStatus();
-  useCleanWorkspaceContext();
+  const isOnResetPassword = router.route === '/password/reset';
 
   useEffect(() => {
     if (!isPlatform || (!isLoading && isAuthenticated)) {
-      router.push('/');
+      // we do not want to redirect if the user tries to reset their password
+      if (!isOnResetPassword) {
+        router.push('/');
+      }
     }
-  }, [isLoading, isAuthenticated, router, isPlatform]);
+  }, [isLoading, isAuthenticated, router, isPlatform, isOnResetPassword]);
 
-  if (!isPlatform || isLoading || isAuthenticated) {
+  if ((!isPlatform || isLoading || isAuthenticated) && !isOnResetPassword) {
     return (
       <BaseLayout {...props}>
         <LoadingScreen
           sx={{ backgroundColor: (theme) => theme.palette.background.default }}
-          slotProps={{
-            activityIndicator: {
-              className: 'text-white',
-            },
-          }}
         />
       </BaseLayout>
     );
@@ -66,14 +63,14 @@ export default function UnauthenticatedLayout({
           >
             <Container
               rootClassName="bg-transparent h-full"
-              className="grid h-full w-full items-center justify-items-center gap-12 bg-transparent pt-8 pb-12 lg:grid-cols-2 lg:gap-4 lg:pt-0 lg:pb-0"
+              className="grid h-full w-full items-center justify-items-center gap-12 bg-transparent pb-12 pt-8 lg:grid-cols-2 lg:gap-4 lg:pb-0 lg:pt-0"
             >
               <div className="relative z-10 order-2 grid w-full max-w-[544px] grid-flow-row gap-12 lg:order-1">
                 {children}
               </div>
 
               <div className="relative z-0 order-1 flex h-full w-full items-center justify-center md:min-h-[150px] lg:order-2 lg:min-h-[none]">
-                <div className="absolute top-0 left-0 right-0 bottom-0 mx-auto flex h-full w-full max-w-xl items-center justify-center opacity-70">
+                <div className="absolute bottom-0 left-0 right-0 top-0 mx-auto flex h-full w-full max-w-xl items-center justify-center overflow-hidden opacity-70">
                   <Image
                     priority
                     src="/assets/line-grid.svg"
