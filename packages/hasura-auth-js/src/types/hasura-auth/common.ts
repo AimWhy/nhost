@@ -1,5 +1,5 @@
 // TODO shared with other packages
-export type ErrorPayload = {
+export type AuthErrorPayload = {
   error: string
   status: number
   message: string
@@ -43,7 +43,8 @@ export interface User {
 export interface NhostSession {
   accessToken: string
   accessTokenExpiresIn: number
-  refreshToken: string
+  refreshToken: string | null
+  refreshTokenId?: string | null
   user: User
 }
 
@@ -71,6 +72,8 @@ export type Provider =
 export interface JWTClaims {
   sub?: string
   iat?: number
+  exp?: number
+  iss?: string
   'https://hasura.io/jwt/claims': JWTHasuraClaims
 }
 
@@ -82,6 +85,7 @@ export interface JWTHasuraClaims {
   'x-hasura-default-role': string
   'x-hasura-user-id': string
   'x-hasura-user-is-anonymous': string
+  'x-hasura-auth-elevated': string
 }
 
 export interface Mfa {
@@ -94,4 +98,18 @@ export interface SecurityKey {
   id: string
   /** Human-readable nickname fof the security key */
   nickname?: string
+}
+
+/**
+ * Data of a personal access token creation response.
+ */
+export interface PersonalAccessTokenCreationResponse {
+  /**
+   * The personal access token identifier.
+   */
+  id: string
+  /**
+   * The personal access token.
+   */
+  personalAccessToken: string
 }

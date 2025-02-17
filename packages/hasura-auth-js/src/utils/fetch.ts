@@ -1,15 +1,27 @@
-import fetch from 'cross-fetch'
+import fetchPonyfill from 'fetch-ponyfill'
 import { NETWORK_ERROR_CODE } from '../errors'
 import { NullableErrorResponse } from '../types'
+
+declare const EdgeRuntime: any
 
 interface FetcResponse<T> extends NullableErrorResponse {
   data: T
 }
 
+let fetch = globalThis.fetch
+
+if (typeof EdgeRuntime !== 'string') {
+  fetch = fetchPonyfill().fetch
+}
+
 const fetchWrapper = async <T>(
   url: string,
   method: 'GET' | 'POST',
-  { token, body }: { token?: string | null; body?: any } = {}
+  {
+    token,
+    body,
+    extraHeaders
+  }: { token?: string | null; body?: any; extraHeaders?: HeadersInit } = {}
 ): Promise<FetcResponse<T>> => {
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -18,9 +30,12 @@ const fetchWrapper = async <T>(
   if (token) {
     headers['Authorization'] = `Bearer ${token}`
   }
+
+  const mergedHeaders = { ...headers, ...extraHeaders }
+
   const options: RequestInit = {
     method,
-    headers
+    headers: mergedHeaders
   }
   if (body) {
     options.body = JSON.stringify(body)
@@ -51,8 +66,9 @@ const fetchWrapper = async <T>(
 export const postFetch = async <T>(
   url: string,
   body: any,
-  token?: string | null
-): Promise<FetcResponse<T>> => fetchWrapper<T>(url, 'POST', { token, body })
+  token?: string | null,
+  extraHeaders?: HeadersInit
+): Promise<FetcResponse<T>> => fetchWrapper<T>(url, 'POST', { token, body, extraHeaders })
 
 export const getFetch = <T>(url: string, token?: string | null): Promise<FetcResponse<T>> =>
   fetchWrapper<T>(url, 'GET', { token })

@@ -1,45 +1,53 @@
+import { ApplyLocalSettingsDialog } from '@/components/common/ApplyLocalSettingsDialog';
 import { useDialog } from '@/components/common/DialogProvider';
-import Container from '@/components/layout/Container';
-import CreateSecretForm from '@/components/settings/secrets/CreateSecretForm';
-import EditSecretForm from '@/components/settings/secrets/EditSecretForm';
-import SettingsContainer from '@/components/settings/SettingsContainer';
-import SettingsLayout from '@/components/settings/SettingsLayout';
-import { useUI } from '@/context/UIContext';
-import { useCurrentWorkspaceAndApplication } from '@/hooks/useCurrentWorkspaceAndApplication';
+import { useUI } from '@/components/common/UIProvider';
+import { Container } from '@/components/layout/Container';
+import { SettingsContainer } from '@/components/layout/SettingsContainer';
+import { SettingsLayout } from '@/components/layout/SettingsLayout';
+import { InlineCode } from '@/components/presentational/InlineCode';
+import { ActivityIndicator } from '@/components/ui/v2/ActivityIndicator';
+import { Box } from '@/components/ui/v2/Box';
+import { Button } from '@/components/ui/v2/Button';
+import { Divider } from '@/components/ui/v2/Divider';
+import { Dropdown } from '@/components/ui/v2/Dropdown';
+import { IconButton } from '@/components/ui/v2/IconButton';
+import { DotsVerticalIcon } from '@/components/ui/v2/icons/DotsVerticalIcon';
+import { PlusIcon } from '@/components/ui/v2/icons/PlusIcon';
+import { List } from '@/components/ui/v2/List';
+import { ListItem } from '@/components/ui/v2/ListItem';
+import { Text } from '@/components/ui/v2/Text';
+import { ProjectLayout } from '@/features/orgs/layout/ProjectLayout';
+import { useCurrentWorkspaceAndProject } from '@/features/projects/common/hooks/useCurrentWorkspaceAndProject';
+import { useIsPlatform } from '@/features/projects/common/hooks/useIsPlatform';
+import { CreateSecretForm } from '@/features/projects/secrets/settings/components/CreateSecretForm';
+import { EditSecretForm } from '@/features/projects/secrets/settings/components/EditSecretForm';
+import { useLocalMimirClient } from '@/hooks/useLocalMimirClient';
 import type { Secret } from '@/types/application';
-import ActivityIndicator from '@/ui/v2/ActivityIndicator';
-import Box from '@/ui/v2/Box';
-import Button from '@/ui/v2/Button';
-import Divider from '@/ui/v2/Divider';
-import { Dropdown } from '@/ui/v2/Dropdown';
-import IconButton from '@/ui/v2/IconButton';
-import DotsVerticalIcon from '@/ui/v2/icons/DotsVerticalIcon';
-import PlusIcon from '@/ui/v2/icons/PlusIcon';
-import List from '@/ui/v2/List';
-import { ListItem } from '@/ui/v2/ListItem';
-import Text from '@/ui/v2/Text';
-import { getToastStyleProps } from '@/utils/settings/settingsConstants';
 import {
   GetSecretsDocument,
   useDeleteSecretMutation,
   useGetSecretsQuery,
 } from '@/utils/__generated__/graphql';
+import { execPromiseWithErrorToast } from '@/utils/execPromiseWithErrorToast';
 import type { ReactElement } from 'react';
 import { Fragment } from 'react';
-import { toast } from 'react-hot-toast';
 import { twMerge } from 'tailwind-merge';
 
 export default function SecretsPage() {
-  const { openDialog, openAlertDialog } = useDialog();
+  const isPlatform = useIsPlatform();
   const { maintenanceActive } = useUI();
-  const { currentApplication } = useCurrentWorkspaceAndApplication();
+  const localMimirClient = useLocalMimirClient();
+  const { openDialog, openAlertDialog } = useDialog();
+  const { currentProject } = useCurrentWorkspaceAndProject();
 
-  const { data, loading, error } = useGetSecretsQuery({
-    variables: { appId: currentApplication?.id },
+  const { data, loading, error, refetch } = useGetSecretsQuery({
+    variables: { appId: currentProject?.id },
+    ...(!isPlatform ? { client: localMimirClient } : {}),
   });
 
   const [deleteSecret] = useDeleteSecretMutation({
     refetchQueries: [GetSecretsDocument],
+    ...(!isPlatform ? { client: localMimirClient } : {}),
   });
 
   if (loading) {
@@ -53,33 +61,40 @@ export default function SecretsPage() {
   async function handleDeleteSecret(secret: Secret) {
     const deleteSecretPromise = deleteSecret({
       variables: {
-        appId: currentApplication?.id,
+        appId: currentProject?.id,
         name: secret.name,
       },
     });
 
-    try {
-      await toast.promise(
-        deleteSecretPromise,
-        {
-          loading: 'Deleting secret...',
-          success: 'Secret has been deleted successfully.',
-          error: (arg: Error) =>
-            arg?.message
-              ? `Error: ${arg?.message}`
-              : 'An error occurred while deleting the secret.',
-        },
-        getToastStyleProps(),
-      );
-    } catch (deleteSecretError) {
-      console.error(deleteSecretError);
-    }
+    await execPromiseWithErrorToast(
+      async () => {
+        await deleteSecretPromise;
+        await refetch();
+
+        if (!isPlatform) {
+          openDialog({
+            title: 'Apply your changes',
+            component: <ApplyLocalSettingsDialog />,
+            props: {
+              PaperProps: {
+                className: 'max-w-2xl',
+              },
+            },
+          });
+        }
+      },
+      {
+        loadingMessage: 'Deleting secret...',
+        successMessage: 'Secret has been deleted successfully.',
+        errorMessage: 'An error occurred while deleting the secret.',
+      },
+    );
   }
 
   function handleOpenCreator() {
     openDialog({
       title: 'Create Secret',
-      component: <CreateSecretForm />,
+      component: <CreateSecretForm onSubmit={refetch} />,
       props: {
         titleProps: { className: '!pb-0' },
         PaperProps: { className: 'gap-2 max-w-md' },
@@ -125,12 +140,22 @@ export default function SecretsPage() {
     >
       <SettingsContainer
         title="Secrets"
-        description="Secrets are key-value pairs configured outside your source code. TBD."
-        docsLink="https://docs.nhost.io/platform/environment-variables"
-        docsTitle="Secrets"
-        rootClassName="gap-0"
+        description={
+          <span>
+            To prevent exposing sensitive information, use secrets in your
+            configuration by replacing the actual value with{' '}
+            <InlineCode className="rounded-sm py-0.5 text-xs">
+              &#123;&#123; secrets.SECRET_NAME &#125;&#125;
+            </InlineCode>{' '}
+            in any configuration placeholder.
+          </span>
+        }
+        rootClassName="gap-0 pb-0"
         className={twMerge('my-2 px-0', secrets.length === 0 && 'gap-2')}
-        slotProps={{ submitButton: { className: 'hidden' } }}
+        slotProps={{
+          submitButton: { className: 'hidden' },
+          footer: { className: 'hidden' },
+        }}
       >
         <Box className="grid grid-cols-2 gap-2 border-b-1 px-4 py-3">
           <Text className="font-medium">Secret Name</Text>
@@ -227,5 +252,17 @@ export default function SecretsPage() {
 }
 
 SecretsPage.getLayout = function getLayout(page: ReactElement) {
-  return <SettingsLayout>{page}</SettingsLayout>;
+  return (
+    <ProjectLayout
+      mainContainerProps={{
+        className: 'flex h-full',
+      }}
+    >
+      <SettingsLayout>
+        <Container sx={{ backgroundColor: 'background.default' }}>
+          {page}
+        </Container>
+      </SettingsLayout>
+    </ProjectLayout>
+  );
 };

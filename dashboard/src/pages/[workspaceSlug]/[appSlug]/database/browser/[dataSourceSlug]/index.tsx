@@ -1,6 +1,9 @@
-import InlineCode from '@/components/common/InlineCode';
-import DataBrowserEmptyState from '@/components/dataBrowser/DataBrowserEmptyState';
-import DataBrowserLayout from '@/components/dataBrowser/DataBrowserLayout';
+import { InlineCode } from '@/components/presentational/InlineCode';
+import { RetryableErrorBoundary } from '@/components/presentational/RetryableErrorBoundary';
+import { Box } from '@/components/ui/v2/Box';
+import { DataBrowserEmptyState } from '@/features/database/dataGrid/components/DataBrowserEmptyState';
+import { DataBrowserSidebar } from '@/features/database/dataGrid/components/DataBrowserSidebar';
+import { ProjectLayout } from '@/features/orgs/layout/ProjectLayout';
 import { useRouter } from 'next/router';
 import type { ReactElement } from 'react';
 
@@ -16,9 +19,7 @@ export default function DataBrowserDatabaseDetailsPage() {
         description={
           <span>
             Database{' '}
-            <InlineCode className="bg-gray-200 bg-opacity-80 px-1.5 text-sm">
-              {dataSourceSlug}
-            </InlineCode>{' '}
+            <InlineCode className="px-1.5 text-sm">{dataSourceSlug}</InlineCode>{' '}
             does not exist.
           </span>
         }
@@ -37,5 +38,20 @@ export default function DataBrowserDatabaseDetailsPage() {
 DataBrowserDatabaseDetailsPage.getLayout = function getLayout(
   page: ReactElement,
 ) {
-  return <DataBrowserLayout>{page}</DataBrowserLayout>;
+  return (
+    <ProjectLayout
+      mainContainerProps={{
+        className: 'flex h-full',
+      }}
+    >
+      <DataBrowserSidebar className="w-full max-w-sidebar" />
+
+      <Box
+        className="flex w-full flex-auto flex-col overflow-x-hidden"
+        sx={{ backgroundColor: 'background.default' }}
+      >
+        <RetryableErrorBoundary>{page}</RetryableErrorBoundary>
+      </Box>
+    </ProjectLayout>
+  );
 };

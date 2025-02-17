@@ -1,15 +1,15 @@
-import AppDeploymentDuration from '@/components/deployments/AppDeploymentDuration';
-import Container from '@/components/layout/Container';
-import ProjectLayout from '@/components/layout/ProjectLayout';
+import { Container } from '@/components/layout/Container';
+import type { DeploymentStatus } from '@/components/presentational/StatusCircle';
+import { StatusCircle } from '@/components/presentational/StatusCircle';
+import { Avatar } from '@/components/ui/v1/Avatar';
+import { ActivityIndicator } from '@/components/ui/v2/ActivityIndicator';
+import { Box } from '@/components/ui/v2/Box';
+import { Link } from '@/components/ui/v2/Link';
+import { Text } from '@/components/ui/v2/Text';
+import { ProjectLayout } from '@/features/orgs/layout/ProjectLayout';
+import { useCurrentWorkspaceAndProject } from '@/features/projects/common/hooks/useCurrentWorkspaceAndProject';
+import { DeploymentDurationLabel } from '@/features/projects/deployments/components/DeploymentDurationLabel';
 import { useDeploymentSubSubscription } from '@/generated/graphql';
-import { useCurrentWorkspaceAndApplication } from '@/hooks/useCurrentWorkspaceAndApplication';
-import { Avatar } from '@/ui/Avatar';
-import type { DeploymentStatus } from '@/ui/StatusCircle';
-import { StatusCircle } from '@/ui/StatusCircle';
-import ActivityIndicator from '@/ui/v2/ActivityIndicator';
-import Box from '@/ui/v2/Box';
-import Link from '@/ui/v2/Link';
-import Text from '@/ui/v2/Text';
 import { format, formatDistanceToNowStrict, parseISO } from 'date-fns';
 import { useRouter } from 'next/router';
 import type { ReactElement } from 'react';
@@ -25,7 +25,7 @@ export default function DeploymentDetailsPage() {
     },
   });
 
-  const { currentApplication } = useCurrentWorkspaceAndApplication();
+  const { currentProject } = useCurrentWorkspaceAndProject();
 
   if (loading) {
     return (
@@ -105,19 +105,19 @@ export default function DeploymentDetailsPage() {
             <Text color="secondary">{relativeDateOfDeployment}</Text>
           </div>
         </div>
-        <div className=" flex items-center">
+        <div className="flex items-center">
           <Link
             className="self-center font-mono font-medium"
             target="_blank"
             rel="noreferrer"
-            href={`https://github.com/${currentApplication.githubRepository?.fullName}/commit/${deployment.commitSHA}`}
+            href={`https://github.com/${currentProject.githubRepository?.fullName}/commit/${deployment.commitSHA}`}
             underline="hover"
           >
             {deployment.commitSHA.substring(0, 7)}
           </Link>
 
           <div className="w-20 text-right">
-            <AppDeploymentDuration
+            <DeploymentDurationLabel
               startedAt={deployment.deploymentStartedAt}
               endedAt={deployment.deploymentEndedAt}
             />
@@ -139,8 +139,8 @@ export default function DeploymentDetailsPage() {
 
           {deployment.deploymentLogs.map((log) => (
             <div key={log.id} className="flex font-mono">
-              <div className=" mr-2 flex-shrink-0">
-                {format(parseISO(log.createdAt), 'KK:mm:ss')}:
+              <div className="mr-2 flex-shrink-0">
+                {format(parseISO(log.createdAt), 'HH:mm:ss')}:
               </div>
               <div className="break-all">{log.message}</div>
             </div>

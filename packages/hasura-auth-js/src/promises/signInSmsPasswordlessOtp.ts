@@ -1,12 +1,12 @@
 import { USER_ALREADY_SIGNED_IN } from '../errors'
 import { AuthInterpreter } from '../machines'
 
-import { ActionLoadingState, SessionActionHandlerResult } from './types'
+import { AuthActionLoadingState, SessionActionHandlerResult } from './types'
 
 export interface SignInSmsPasswordlessOtpHandlerResult extends SessionActionHandlerResult {}
 export interface SignInSmsPasswordlessOtpState
   extends SignInSmsPasswordlessOtpHandlerResult,
-    ActionLoadingState {}
+    AuthActionLoadingState {}
 
 export const signInSmsPasswordlessOtpPromise = (
   interpreter: AuthInterpreter,
@@ -21,7 +21,8 @@ export const signInSmsPasswordlessOtpPromise = (
         isError: true,
         isSuccess: false,
         user: null,
-        accessToken: null
+        accessToken: null,
+        refreshToken: null
       })
     }
     interpreter.onTransition((state) => {
@@ -31,7 +32,8 @@ export const signInSmsPasswordlessOtpPromise = (
           isError: false,
           isSuccess: true,
           user: state.context.user,
-          accessToken: state.context.accessToken.value
+          accessToken: state.context.accessToken.value,
+          refreshToken: state.context.refreshToken.value
         })
       } else if (state.matches({ registration: { incomplete: 'failed' } })) {
         resolve({
@@ -39,7 +41,8 @@ export const signInSmsPasswordlessOtpPromise = (
           isError: true,
           isSuccess: false,
           user: null,
-          accessToken: null
+          accessToken: null,
+          refreshToken: null
         })
       }
     })

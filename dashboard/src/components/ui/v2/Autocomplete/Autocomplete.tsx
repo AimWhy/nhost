@@ -1,15 +1,16 @@
-import Chip from '@/ui/v2/Chip';
-import type { FormControlProps } from '@/ui/v2/FormControl';
-import ChevronDownIcon from '@/ui/v2/icons/ChevronDownIcon';
-import XIcon from '@/ui/v2/icons/XIcon';
-import type { InputProps } from '@/ui/v2/Input';
-import Input, { inputClasses } from '@/ui/v2/Input';
-import { OptionBase } from '@/ui/v2/Option';
-import { OptionGroupBase } from '@/ui/v2/OptionGroup';
+import { Chip } from '@/components/ui/v2/Chip';
+import type { FormControlProps } from '@/components/ui/v2/FormControl';
+import { CheckIcon } from '@/components/ui/v2/icons/CheckIcon';
+import { ChevronDownIcon } from '@/components/ui/v2/icons/ChevronDownIcon';
+import { XIcon } from '@/components/ui/v2/icons/XIcon';
+import type { InputProps } from '@/components/ui/v2/Input';
+import { Input, inputClasses } from '@/components/ui/v2/Input';
+import { OptionBase } from '@/components/ui/v2/Option';
+import { OptionGroupBase } from '@/components/ui/v2/OptionGroup';
 import type { StyledComponent } from '@emotion/styled';
-import type { UseAutocompleteProps } from '@mui/base/AutocompleteUnstyled';
-import { createFilterOptions } from '@mui/base/AutocompleteUnstyled';
-import PopperUnstyled from '@mui/base/PopperUnstyled';
+import { Popper } from '@mui/base';
+import type { UseAutocompleteProps } from '@mui/base/useAutocomplete';
+import { createFilterOptions } from '@mui/base/useAutocomplete';
 import { styled } from '@mui/material';
 import type { AutocompleteProps as MaterialAutocompleteProps } from '@mui/material/Autocomplete';
 import MaterialAutocomplete, {
@@ -96,8 +97,10 @@ export interface AutocompleteProps<
   autoSelect?: boolean | ((filteredOptions?: AutocompleteOption[]) => boolean);
   /**
    * Show custom option at the end of filtered options.
+   *
+   * @default 'never'
    */
-  showCustomOption?: boolean;
+  showCustomOption?: 'always' | 'never' | 'auto';
   /**
    * Custom option label.
    */
@@ -132,7 +135,14 @@ const StyledAutocomplete = styled(MaterialAutocomplete)(({ theme }) => ({
   MaterialAutocompleteProps<AutocompleteOption, boolean, boolean, boolean>
 >;
 
-export const AutocompletePopper = styled(PopperUnstyled)(({ theme }) => ({
+const StyledOptionBase = styled(OptionBase)(({ theme }) => ({
+  display: 'grid !important',
+  gridAutoFlow: 'column',
+  justifyContent: 'space-between !important',
+  gap: theme.spacing(0.5),
+}));
+
+export const AutocompletePopper = styled(Popper)(({ theme }) => ({
   zIndex: theme.zIndex.modal + 1,
   boxShadow: 'none',
   minWidth: 320,
@@ -174,7 +184,10 @@ export const AutocompletePopper = styled(PopperUnstyled)(({ theme }) => ({
   },
 }));
 
-const filterOptions = createFilterOptions<AutocompleteOption>({
+/**
+ * Function to be used to filter options.
+ */
+export const filterOptions = createFilterOptions<AutocompleteOption>({
   matchFrom: 'any',
   ignoreAccents: true,
   ignoreCase: true,
@@ -198,7 +211,7 @@ function Autocomplete(
     filterOptions: externalFilterOptions,
     autoSelect: externalAutoSelect,
     customOptionLabel: externalCustomOptionLabel,
-    showCustomOption,
+    showCustomOption = 'never',
     'aria-label': ariaLabel,
     ...props
   }: AutocompleteProps<AutocompleteOption>,
@@ -218,18 +231,22 @@ function Autocomplete(
     setInputValue(externalInputValue);
   }, [externalInputValue]);
 
-  const filteredOptions = filterOptions(props.options as AutocompleteOption[], {
-    inputValue: inputValue || '',
-    getOptionLabel: props.getOptionLabel
-      ? props.getOptionLabel
-      : (option: string | number | AutocompleteOption<string>) => {
-          if (typeof option !== 'object') {
-            return option.toString();
-          }
+  const filterOptionsFn = externalFilterOptions || filterOptions;
+  const filteredOptions = filterOptionsFn(
+    props.options as AutocompleteOption[],
+    {
+      inputValue: inputValue || '',
+      getOptionLabel: props.getOptionLabel
+        ? props.getOptionLabel
+        : (option: string | number | AutocompleteOption<string>) => {
+            if (typeof option !== 'object') {
+              return option.toString();
+            }
 
-          return option.label ?? option.dropdownLabel;
-        },
-  });
+            return option.label ?? option.dropdownLabel;
+          },
+    },
+  );
 
   const autoSelect =
     typeof externalAutoSelect === 'function'
@@ -317,6 +334,7 @@ function Autocomplete(
             <StyledTag
               deleteIcon={<XIcon />}
               size="small"
+              sx={{ fontSize: (theme) => theme.typography.pxToRem(12) }}
               label={
                 typeof option !== 'object' ? option.toString() : option.value
               }
@@ -340,38 +358,71 @@ function Autocomplete(
         optionProps,
         option: string | number | AutocompleteOption<string>,
       ) => {
+        const selected = optionProps['aria-selected'];
+
         if (typeof option !== 'object') {
-          return <OptionBase {...optionProps}>{option.toString()}</OptionBase>;
+          return (
+            <StyledOptionBase {...optionProps} key={option.toString()}>
+              {option.toString()}
+              {selected && props.multiple && (
+                <CheckIcon sx={{ width: 16, height: 16 }} />
+              )}
+            </StyledOptionBase>
+          );
         }
 
         return (
-          <OptionBase
+          <StyledOptionBase
             {...optionProps}
             key={option.dropdownLabel || option.label}
           >
-            {option.dropdownLabel || option.label}
-          </OptionBase>
+            <>
+              <span>{option.dropdownLabel || option.label}</span>
+
+              {selected && props.multiple && (
+                <CheckIcon key="asd" sx={{ width: 16, height: 16 }} />
+              )}
+            </>
+          </StyledOptionBase>
         );
       }}
       filterOptions={
-        showCustomOption
+        showCustomOption !== 'never'
           ? () => {
-              if (inputValue) {
-                return [
-                  ...filteredOptions,
-                  {
-                    value: inputValue,
-                    label: inputValue,
-                    dropdownLabel:
-                      customOptionLabel || `Select "${inputValue}"`,
-                    custom: Boolean(inputValue),
-                  },
-                ];
+              if (!inputValue) {
+                return filteredOptions;
               }
 
-              return filteredOptions;
+              if (showCustomOption === 'auto') {
+                const isInputValueInOptions = filteredOptions.some(
+                  (filteredOption) => filteredOption.label === inputValue,
+                );
+
+                return isInputValueInOptions
+                  ? filteredOptions
+                  : [
+                      ...filteredOptions,
+                      {
+                        value: inputValue,
+                        label: inputValue,
+                        dropdownLabel:
+                          customOptionLabel || `Select "${inputValue}"`,
+                        custom: Boolean(inputValue),
+                      },
+                    ];
+              }
+
+              return [
+                ...filteredOptions,
+                {
+                  value: inputValue,
+                  label: inputValue,
+                  dropdownLabel: customOptionLabel || `Select "${inputValue}"`,
+                  custom: Boolean(inputValue),
+                },
+              ];
             }
-          : externalFilterOptions || filterOptions
+          : filterOptionsFn
       }
       autoSelect={autoSelect}
       renderInput={({

@@ -1,16 +1,11 @@
-import DesktopNav from '@/components/common/DesktopNav';
-import { LoadingScreen } from '@/components/common/LoadingScreen';
 import type { AuthenticatedLayoutProps } from '@/components/layout/AuthenticatedLayout';
-import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout';
-import useIsPlatform from '@/hooks/common/useIsPlatform';
-import useProjectRoutes from '@/hooks/common/useProjectRoutes';
-import { useCurrentWorkspaceAndApplication } from '@/hooks/useCurrentWorkspaceAndApplication';
-import { useGetAllUserWorkspacesAndApplications } from '@/hooks/useGetAllUserWorkspacesAndApplications';
-import { useNavigationVisible } from '@/hooks/useNavigationVisible';
-import useNotFoundRedirect from '@/hooks/useNotFoundRedirect';
-import { useSetAppWorkspaceContextFromUserContext } from '@/hooks/useSetAppWorkspaceContextFromUserContext';
-import type { BoxProps } from '@/ui/v2/Box';
-import Box from '@/ui/v2/Box';
+import { AuthenticatedLayout } from '@/components/layout/AuthenticatedLayout';
+import { LoadingScreen } from '@/components/presentational/LoadingScreen';
+import type { BoxProps } from '@/components/ui/v2/Box';
+import { Box } from '@/components/ui/v2/Box';
+import { useProject } from '@/features/orgs/projects/hooks/useProject';
+import { useIsPlatform } from '@/features/projects/common/hooks/useIsPlatform';
+import { useProjectRoutes } from '@/features/projects/common/hooks/useProjectRoutes';
 import { NextSeo } from 'next-seo';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -30,11 +25,8 @@ function ProjectLayoutContent({
     ...mainContainerProps
   } = {},
 }: ProjectLayoutProps) {
-  const { currentApplication, currentWorkspace } =
-    useCurrentWorkspaceAndApplication();
-
+  const { project, loading, error } = useProject();
   const router = useRouter();
-  const shouldDisplayNav = useNavigationVisible();
   const isPlatform = useIsPlatform();
   const { nhostRoutes } = useProjectRoutes();
   const pathWithoutWorkspaceAndProject = router.asPath.replace(
@@ -49,9 +41,8 @@ function ProjectLayoutContent({
       ),
     );
 
-  useGetAllUserWorkspacesAndApplications(false);
-  useSetAppWorkspaceContextFromUserContext();
-  useNotFoundRedirect();
+  // TODO(orgs) 1
+  // useNotFoundRedirect();
 
   useEffect(() => {
     if (isPlatform || !router.isReady) {
@@ -63,37 +54,16 @@ function ProjectLayoutContent({
     }
   }, [isPlatform, isRestrictedPath, router]);
 
-  if (!currentWorkspace || !currentApplication || isRestrictedPath) {
+  if (isRestrictedPath || loading) {
     return <LoadingScreen />;
+  }
+
+  if (error) {
+    throw error;
   }
 
   if (!isPlatform) {
     return (
-      <>
-        <DesktopNav className="top-0 hidden w-20 shrink-0 flex-col items-start sm:flex" />
-
-        <Box
-          component="main"
-          className={twMerge(
-            'relative flex-auto overflow-y-auto',
-            mainContainerClassName,
-          )}
-          {...mainContainerProps}
-        >
-          {children}
-
-          <NextSeo title="Local App" />
-        </Box>
-      </>
-    );
-  }
-
-  return (
-    <>
-      {shouldDisplayNav && (
-        <DesktopNav className="top-0 hidden w-20 shrink-0 flex-col items-start sm:flex" />
-      )}
-
       <Box
         component="main"
         className={twMerge(
@@ -103,10 +73,24 @@ function ProjectLayoutContent({
         {...mainContainerProps}
       >
         {children}
-
-        <NextSeo title={currentApplication.name} />
+        <NextSeo title="Local App" />
       </Box>
-    </>
+    );
+  }
+
+  return (
+    <Box
+      component="main"
+      className={twMerge(
+        'relative flex-auto overflow-y-auto',
+        mainContainerClassName,
+      )}
+      {...mainContainerProps}
+    >
+      {children}
+
+      <NextSeo title={project?.name} />
+    </Box>
   );
 }
 

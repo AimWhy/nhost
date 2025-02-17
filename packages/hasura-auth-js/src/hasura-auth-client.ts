@@ -1,4 +1,4 @@
-import jwt_decode from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode'
 import { interpret } from 'xstate'
 import {
   EMAIL_NEEDS_VERIFICATION,
@@ -19,31 +19,44 @@ import {
   addSecurityKeyPromise,
   changeEmailPromise,
   changePasswordPromise,
+  elevateEmailSecurityKeyPromise,
   resetPasswordPromise,
   sendVerificationEmailPromise,
   signInAnonymousPromise,
+  signInEmailOTPPromise,
   signInEmailPasswordlessPromise,
   signInEmailPasswordPromise,
   signInEmailSecurityKeyPromise,
   signInMfaTotpPromise,
+  signInPATPromise,
+  signInSecurityKeyPromise,
   signInSmsPasswordlessOtpPromise,
   signInSmsPasswordlessPromise,
   signOutPromise,
   signUpEmailPasswordPromise,
-  signUpEmailSecurityKeyPromise
+  signUpEmailSecurityKeyPromise,
+  verifyEmailOTPPromise
 } from './promises'
+import { createPATPromise } from './promises/createPAT'
+import { linkIdTokenPromise } from './promises/linkIdToken'
+import { signInIdTokenPromise } from './promises/signInIdToken'
 import {
   AuthChangedFunction,
+  AuthErrorPayload,
   ChangeEmailParams,
   ChangeEmailResponse,
   ChangePasswordParams,
   ChangePasswordResponse,
+  ConnectProviderParams,
+  ConnectProviderResponse,
   DeanonymizeParams,
   DeanonymizeResponse,
-  ErrorPayload,
+  EmailOTPOptions,
   JWTClaims,
   JWTHasuraClaims,
+  LinkIdTokenParams,
   NhostAuthConstructorParams,
+  NhostSession,
   NhostSessionResponse,
   OnTokenChangedFunction,
   ResetPasswordParams,
@@ -51,7 +64,9 @@ import {
   SecurityKey,
   SendVerificationEmailParams,
   SendVerificationEmailResponse,
+  SignInIdTokenParams,
   SignInParams,
+  SignInPATResponse,
   SignInResponse,
   SignOutResponse,
   SignUpParams,
@@ -73,6 +88,7 @@ export class HasuraAuthClient {
   readonly url: string
   constructor({
     url,
+    broadcastKey,
     autoRefreshToken = true,
     autoSignIn = true,
     clientStorage,
@@ -84,6 +100,7 @@ export class HasuraAuthClient {
     this._client = new AuthClient({
       backendUrl: url,
       clientUrl: (typeof window !== 'undefined' && window.location?.origin) || '',
+      broadcastKey,
       autoRefreshToken,
       autoSignIn,
       start,
@@ -126,6 +143,84 @@ export class HasuraAuthClient {
     return getAuthenticationResult(
       await signUpEmailPasswordPromise(interpreter, email, params.password, options)
     )
+  }
+
+  /**
+   * Use `nhost.auth.connectProvider` to connect a social authentication provider to an existing user account
+   *
+   * @example
+   * ### Connect an authentication provider to an existing user account
+   * ```ts
+   * nhost.auth.connectProvider({
+   *   provider: 'github
+   *   options: {
+   *    redirectTo: window.location.href
+   *   }
+   * })
+   * ```
+   *
+   * @docs https://docs.nhost.io/reference/javascript/auth/connect-provider
+   */
+  async connectProvider(params: ConnectProviderParams): Promise<ConnectProviderResponse> {
+    const interpreter = await this.waitUntilReady()
+    const accessToken = interpreter.getSnapshot().context.accessToken.value
+
+    const { provider, options } = params
+
+    const providerUrl = encodeQueryParameters(
+      `${this._client.backendUrl}/signin/provider/${provider}`,
+      rewriteRedirectTo(this._client.clientUrl, {
+        ...options,
+        connect: accessToken
+      } as any)
+    )
+    if (isBrowser()) {
+      window.location.href = providerUrl
+    }
+
+    return { providerUrl }
+  }
+
+  /**
+   * Use `nhost.auth.signInIdToken` to sign in a user with the provider's account using an ID token
+   *
+   * @example
+   * ### Sign in a user with an id token
+   * ```ts
+   * nhost.auth.signInIdToken({
+   *   provider: 'google', // The provider name, e.g., 'google', 'apple', etc.
+   *   idToken: '...', // The ID token issued by the provider.
+   *   nonce: '...', // Optional: The nonce used during token generation.
+   * });
+   * ```
+   *
+   * @docs https://docs.nhost.io/reference/javascript/auth/sign-in-idtoken
+   */
+  async signInIdToken(params: SignInIdTokenParams) {
+    const interpreter = await this.waitUntilReady()
+
+    const res = await signInIdTokenPromise(interpreter, params)
+
+    return { ...getAuthenticationResult(res), mfa: null }
+  }
+
+  /**
+   * Use `nhost.auth.linkIdToken` to link a user account with the provider's account using an ID token
+   *
+   * @example
+   * ### Link a user account with the provider's account using an id token
+   * ```ts
+   * nhost.auth.linkIdToken({
+   *   provider: 'google', // The provider name, e.g., 'google', 'apple', etc.
+   *   idToken: '...', // The ID token issued by the provider.
+   *   nonce: '...', // Optional: The nonce used during token generation.
+   * })
+   * ```
+   *
+   * @docs https://docs.nhost.io/reference/javascript/auth/link-idtoken
+   */
+  async linkIdToken(params: LinkIdTokenParams) {
+    return linkIdTokenPromise(this._client, params)
   }
 
   /**
@@ -269,6 +364,88 @@ export class HasuraAuthClient {
   }
 
   /**
+   * Use `nhost.auth.signInPAT` to sign in with a personal access token (PAT).
+   *
+   * @example
+   * ```ts
+   * nhost.auth.signInPAT('34f74930-09c0-4af5-a8d5-28fad78e3415')
+   * ```
+   *
+   * @docs https://docs.nhost.io/reference/javascript/auth/sign-in-pat
+   *
+   * @param personalAccessToken - The personal access token to sign in with
+   */
+  async signInPAT(personalAccessToken: string): Promise<SignInPATResponse> {
+    const interpreter = await this.waitUntilReady()
+    const res = await signInPATPromise(interpreter, personalAccessToken)
+
+    return getAuthenticationResult(res)
+  }
+
+  /**
+   * Use `nhost.auth.signInEmailOTP` to sign in with an email one-time password (OTP).
+   *
+   * @example
+   * ```ts
+   * nhost.auth.signInEmailOTP('user@example.com')
+   * ```
+   *
+   * @docs https://docs.nhost.io/reference/javascript/auth/sign-in-email-otp
+   *
+   * @param email - The email address to send the OTP to
+   */
+  async signInEmailOTP(email: string, options?: EmailOTPOptions): Promise<SignInResponse> {
+    const interpreter = await this.waitUntilReady()
+
+    const { error } = await signInEmailOTPPromise(interpreter, email, options)
+
+    return {
+      error,
+      session: null,
+      mfa: null
+    }
+  }
+
+  /**
+   * Use `nhost.auth.verifyEmailOTP` to verify an email one-time password (OTP) and complete the sign-in process
+   *
+   * @example
+   * ```ts
+   * nhost.auth.verifyEmailOTP('user@example.com', '123456')
+   * ```
+   *
+   * @docs https://docs.nhost.io/reference/javascript/auth/verify-email-otp
+   *
+   * @param email - The email address to verify the OTP for
+   * @param otp - The one-time password sent to the email address
+   */
+  async verifyEmailOTP(email: string, otp: string): Promise<SignInResponse> {
+    const interpreter = await this.waitUntilReady()
+
+    const res = await verifyEmailOTPPromise(interpreter, email, otp)
+
+    return { ...getAuthenticationResult(res), mfa: null }
+  }
+
+  /**
+   * Use `nhost.auth.signInSecurityKey` to sign in a user with a security key using the WebAuthn API
+   *
+   * @example
+   * ```ts
+   * nhost.auth.signInSecurityKey()
+   * ```
+   *
+   * @docs https://docs.nhost.io/reference/javascript/auth/sign-in-security-key
+   */
+  async signInSecurityKey(): Promise<SignInResponse> {
+    const interpreter = await this.waitUntilReady()
+
+    const res = await signInSecurityKeyPromise(interpreter)
+
+    return { ...getAuthenticationResult(res), mfa: null }
+  }
+
+  /**
    * Use `nhost.auth.signOut` to sign out the user.
    *
    * @example
@@ -404,16 +581,44 @@ export class HasuraAuthClient {
   }
 
   /**
-   * Use `nhost.auth.addSecurityKey to add a security key to the user, using the WebAuthn API.
+   * Use `nhost.auth.addSecurityKey` to add a security key to the user, using the WebAuthn API.
    * @param nickname optional human-readable nickname for the security key
    *
    * @docs https://docs.nhost.io/reference/javascript/auth/add-security-key
    */
   async addSecurityKey(
     nickname?: string
-  ): Promise<{ error: ErrorPayload | null; key?: SecurityKey }> {
+  ): Promise<{ error: AuthErrorPayload | null; key?: SecurityKey }> {
     const { error, key } = await addSecurityKeyPromise(this._client, nickname)
     return { error, key }
+  }
+
+  /**
+   * Use `nhost.auth.elevateEmailSecurityKey` to get a temporary elevated auth permissions to run sensitive operations.
+   * @param email user email
+   *
+   * @docs https://docs.nhost.io/reference/javascript/auth/elevate-email-security-key
+   */
+  async elevateEmailSecurityKey(email: string) {
+    if (!email) {
+      throw Error('A user email is required')
+    }
+
+    const res = await elevateEmailSecurityKeyPromise(this._client, email)
+
+    return { ...res, mfa: null }
+  }
+
+  /**
+   * Use `nhost.auth.createPAT` to create a personal access token for the user.
+   *
+   * @param expiresAt Expiration date for the token
+   * @param metadata Optional metadata to store with the token
+   *
+   * @docs https://docs.nhost.io/reference/javascript/auth/create-pat
+   */
+  async createPAT(expiresAt: Date, metadata?: Record<string, string | number>) {
+    return createPATPromise(this._client, { expiresAt, metadata })
   }
 
   /**
@@ -569,13 +774,12 @@ export class HasuraAuthClient {
    * const decodedAccessToken = nhost.auth.getDecodedAccessToken();
    * ```
    *
-   * @see {@link https://hasura.io/docs/latest/graphql/core/auth/authentication/jwt/| Hasura documentation}
    * @docs https://docs.nhost.io/reference/javascript/auth/get-decoded-access-token
    */
   public getDecodedAccessToken(): JWTClaims | null {
     const jwt = this.getAccessToken()
     if (!jwt) return null
-    return jwt_decode<JWTClaims>(jwt)
+    return jwtDecode<JWTClaims>(jwt)
   }
 
   /**
@@ -586,7 +790,6 @@ export class HasuraAuthClient {
    * const hasuraClaims = nhost.auth.getHasuraClaims();
    * ```
    *
-   * @see {@link https://hasura.io/docs/latest/graphql/core/auth/authentication/jwt/| Hasura documentation}
    * @docs https://docs.nhost.io/reference/javascript/auth/get-hasura-claims
    */
   public getHasuraClaims(): JWTHasuraClaims | null {
@@ -599,12 +802,11 @@ export class HasuraAuthClient {
    * @example
    * ```ts
    * // if `x-hasura-company-id` exists as a custom claim
-   * const companyId = nhost.auth.getHsauraClaim('company-id')
+   * const companyId = nhost.auth.getHasuraClaim('company-id')
    * ```
    *
    * @param name Name of the variable. You don't have to specify `x-hasura-`.
    *
-   * @see {@link https://hasura.io/docs/latest/graphql/core/auth/authentication/jwt/| Hasura documentation}
    * @docs https://docs.nhost.io/reference/javascript/auth/get-hasura-claim
    */
   public getHasuraClaim(name: string): string | string[] | null {
@@ -622,10 +824,10 @@ export class HasuraAuthClient {
    * @example
    * ```ts
    * // Refresh the session with the the current internal refresh token.
-   * nhost.auth.refreshToken();
+   * nhost.auth.refreshSession();
    *
    * // Refresh the session with an external refresh token.
-   * nhost.auth.refreshToken(refreshToken);
+   * nhost.auth.refreshSession(refreshToken);
    * ```
    *
    * @docs https://docs.nhost.io/reference/javascript/auth/refresh-session
@@ -673,6 +875,23 @@ export class HasuraAuthClient {
    */
   getSession() {
     return getSession(this._client.interpreter?.getSnapshot()?.context)
+  }
+
+  /**
+   * Initialize the auth client with an existing session
+   *
+   * @example
+   * ### Initialize with an existing Nhost session
+   * ```ts
+   * await nhost.auth.initWithSession({ session: initialSession })
+   * ```
+   *
+   * @param session - The Nhost session object to initialize the client with
+   * @docs https://docs.nhost.io/reference/javascript/auth/init-with-session
+   */
+  async initWithSession({ session }: { session: NhostSession }): Promise<void> {
+    this.client.start({ initialSession: session })
+    await this.waitUntilReady()
   }
 
   /**

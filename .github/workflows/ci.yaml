@@ -18,7 +18,17 @@ env:
   TURBO_TEAM: nhost
   NEXT_PUBLIC_ENV: dev
   NEXT_TELEMETRY_DISABLED: 1
-  NEXT_PUBLIC_NHOST_BACKEND_URL: http://localhost:1337
+  NHOST_TEST_DASHBOARD_URL: ${{ vars.NHOST_TEST_DASHBOARD_URL }}
+  NHOST_TEST_WORKSPACE_NAME: ${{ vars.NHOST_TEST_WORKSPACE_NAME }}
+  NHOST_TEST_PROJECT_NAME: ${{ vars.NHOST_TEST_PROJECT_NAME }}
+  NHOST_TEST_ORGANIZATION_NAME: ${{ vars.NHOST_TEST_ORGANIZATION_NAME }}
+  NHOST_TEST_ORGANIZATION_SLUG: ${{ vars.NHOST_TEST_ORGANIZATION_SLUG }}
+  NHOST_TEST_PERSONAL_ORG_SLUG: ${{ vars.NHOST_TEST_PERSONAL_ORG_SLUG }}
+  NHOST_TEST_PROJECT_SUBDOMAIN: ${{ vars.NHOST_TEST_PROJECT_SUBDOMAIN }}
+  NHOST_PRO_TEST_PROJECT_NAME: ${{ vars.NHOST_PRO_TEST_PROJECT_NAME }}
+  NHOST_TEST_USER_EMAIL: ${{ secrets.NHOST_TEST_USER_EMAIL }}
+  NHOST_TEST_USER_PASSWORD: ${{ secrets.NHOST_TEST_USER_PASSWORD }}
+  NHOST_TEST_PROJECT_ADMIN_SECRET: ${{ secrets.NHOST_TEST_PROJECT_ADMIN_SECRET }}
 
 jobs:
   build:
@@ -37,7 +47,7 @@ jobs:
           BUILD: 'all'
       - name: Check if the pnpm lockfile changed
         id: changed-lockfile
-        uses: tj-actions/changed-files@v35
+        uses: tj-actions/changed-files@v37
         with:
           files: pnpm-lock.yaml
       # * Determine a pnpm filter argument for packages that have been modified.
@@ -59,47 +69,6 @@ jobs:
           echo "matrix=$PACKAGES" >> $GITHUB_OUTPUT
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
-
-  e2e:
-    name: 'e2e (${{ matrix.package.path }})'
-    needs: build
-    if: ${{ needs.build.outputs.matrix != '[]' && needs.build.outputs.matrix != '' }}
-    strategy:
-      # * Don't cancel other matrices when one fails
-      fail-fast: false
-      matrix:
-        package: ${{ fromJson(needs.build.outputs.matrix) }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      # * Install Node and dependencies. Package dependencies won't be downloaded again as they have been cached by the `build` job.
-      - name: Install Node and dependencies
-        uses: ./.github/actions/install-dependencies
-        with:
-          TURBO_TOKEN: ${{ env.TURBO_TOKEN }}
-          TURBO_TEAM: ${{ env.TURBO_TEAM }}
-      # * Install Nhost CLI if a `nhost/config.yaml` file is found
-      - name: Install Nhost CLI
-        if: hashFiles(format('{0}/nhost/config.yaml', matrix.package.path)) != ''
-        uses: ./.github/actions/nhost-cli
-      # * Run the `ci` script of the current package of the matrix. Dependencies build is cached by Turborepo
-      - name: Run e2e test
-        run: pnpm --filter="${{ matrix.package.name }}" run e2e
-      - id: file-name
-        if: ${{ failure() }}
-        name: Tranform package name into a valid file name
-        run: |
-          PACKAGE_FILE_NAME=$(echo "${{ matrix.package.name }}" | sed 's/@//g; s/\//-/g')
-          echo "fileName=$PACKAGE_FILE_NAME"  >> $GITHUB_OUTPUT
-      # * Run this step only if the previous step failed, and some Cypress screenshots/videos exist
-      - name: Upload Cypress videos and screenshots
-        if: ${{ failure() && hashFiles(format('{0}/cypress/screenshots/**', matrix.package.path), format('{0}/cypress/videos/**', matrix.package.path)) != ''}}
-        uses: actions/upload-artifact@v3
-        with:
-          name: cypress-${{ steps.file-name.outputs.fileName }}
-          path: |
-            ${{format('{0}/cypress/screenshots/**', matrix.package.path)}}
-            ${{format('{0}/cypress/videos/**', matrix.package.path)}}
 
   unit:
     name: Unit tests
@@ -138,6 +107,66 @@ jobs:
         with:
           TURBO_TOKEN: ${{ env.TURBO_TOKEN }}
           TURBO_TEAM: ${{ env.TURBO_TEAM }}
+      - name: Enforce Prettier formatting in dashboard
+        working-directory: ./dashboard
+        run: pnpm prettier --check "./**/*.tsx" --config prettier.config.js
       # * Run every `lint` script in the workspace . Dependencies build is cached by Turborepo
       - name: Lint
         run: pnpm run lint:all
+      - name: Audit for vulnerabilities
+        run: pnpx audit-ci --config ./audit-ci.jsonc
+
+  e2e:
+    name: 'E2E (Package: ${{ matrix.package.path }})'
+    needs: build
+    if: ${{ needs.build.outputs.matrix != '[]' && needs.build.outputs.matrix != '' }}
+    strategy:
+      # * Don't cancel other matrices when one fails
+      fail-fast: false
+      matrix:
+        package: ${{ fromJson(needs.build.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      # * Install Node and dependencies. Package dependencies won't be downloaded again as they have been cached by the `build` job.
+      - name: Install Node and dependencies
+        uses: ./.github/actions/install-dependencies
+        with:
+          TURBO_TOKEN: ${{ env.TURBO_TOKEN }}
+          TURBO_TEAM: ${{ env.TURBO_TEAM }}
+      # * Install Nhost CLI if a `nhost/config.yaml` file is found
+      - name: Install Nhost CLI
+        if: hashFiles(format('{0}/nhost/config.yaml', matrix.package.path)) != ''
+        uses: ./.github/actions/nhost-cli
+      - name: Fetch Dashboard Preview URL
+        id: fetch-dashboard-preview-url
+        uses: zentered/vercel-preview-url@v1.1.9
+        if: github.ref_name != 'main'
+        env:
+          VERCEL_TOKEN: ${{ secrets.DASHBOARD_VERCEL_DEPLOY_TOKEN }}
+          GITHUB_REF: ${{ github.ref_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        with:
+          vercel_team_id: ${{ secrets.DASHBOARD_VERCEL_TEAM_ID }}
+          vercel_project_id: ${{ secrets.DASHBOARD_STAGING_VERCEL_PROJECT_ID }}
+          vercel_state: BUILDING,READY,INITIALIZING
+      - name: Set Dashboard Preview URL
+        if: steps.fetch-dashboard-preview-url.outputs.preview_url != ''
+        run: echo "NHOST_TEST_DASHBOARD_URL=https://${{ steps.fetch-dashboard-preview-url.outputs.preview_url }}" >> $GITHUB_ENV
+      # * Run the `ci` script of the current package of the matrix. Dependencies build is cached by Turborepo
+      - name: Run e2e tests
+        timeout-minutes: 20
+        run: pnpm --filter="${{ matrix.package.name }}" run e2e
+      - id: file-name
+        if: ${{ failure() }}
+        name: Transform package name into a valid file name
+        run: |
+          PACKAGE_FILE_NAME=$(echo "${{ matrix.package.name }}" | sed 's/@//g; s/\//-/g')
+          echo "fileName=$PACKAGE_FILE_NAME"  >> $GITHUB_OUTPUT
+      # * Run this step only if the previous step failed, and Playwright generated a report
+      - name: Upload Playwright Report
+        if: ${{ failure() && hashFiles(format('{0}/playwright-report/**', matrix.package.path)) != ''}}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-${{ steps.file-name.outputs.fileName }}
+          path: ${{format('{0}/playwright-report/**', matrix.package.path)}}

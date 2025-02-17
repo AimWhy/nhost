@@ -1,21 +1,21 @@
-import FormData from 'form-data'
+import LegacyFormData from 'form-data'
 
 // TODO shared with other packages
-export type ErrorPayload = {
+export type StorageErrorPayload = {
   error: string
   status: number
   message: string
 }
 
 // TODO shared with other packages
-export interface ActionErrorState {
+export interface StorageActionErrorState {
   /**
    * @return `true` if an error occurred
    * @depreacted use `!isSuccess` or `!!error` instead
    * */
   isError: boolean
   /** Provides details about the error */
-  error: ErrorPayload | null
+  error: StorageErrorPayload | null
 }
 
 // * Avoid circular references and broken links in docusaurus generated docs
@@ -25,8 +25,12 @@ export interface FileUploadConfig {
   adminSecret?: string
 }
 
+export interface StorageHeadersParam {
+  headers?: Record<string, string>
+}
+
 // works only in browser. Used for for hooks
-export interface StorageUploadFileParams {
+export interface StorageUploadFileParams extends StorageHeadersParam {
   file: File
   id?: string
   name?: string
@@ -34,19 +38,31 @@ export interface StorageUploadFileParams {
 }
 
 // works in browser and server
-export interface StorageUploadFormDataParams {
-  formData: FormData
-  id?: string
-  name?: string
+export interface StorageUploadFormDataParams extends StorageHeadersParam {
+  formData: FormData | LegacyFormData
   bucketId?: string
 }
 
 // works in browser and server
 export type StorageUploadParams = StorageUploadFileParams | StorageUploadFormDataParams
 
-export type StorageUploadResponse =
+export type StorageUploadFileResponse =
   | { fileMetadata: FileResponse; error: null }
-  | { fileMetadata: null; error: ErrorPayload }
+  | { fileMetadata: null; error: StorageErrorPayload }
+
+export type StorageUploadFormDataResponse =
+  | { fileMetadata: { processedFiles: FileResponse[] }; error: null }
+  | { fileMetadata: null; error: StorageErrorPayload }
+
+export type StorageUploadResponse = StorageUploadFileResponse | StorageUploadFormDataResponse
+
+export interface StorageDownloadFileParams
+  extends StorageImageTransformationParams,
+    StorageHeadersParam {
+  fileId: string
+}
+
+export type StorageDownloadFileResponse = { file: Blob; error: null } | { file: null; error: Error }
 
 export interface StorageImageTransformationParams {
   /** Image width, in pixels */
@@ -65,9 +81,9 @@ export interface StorageGetUrlParams extends StorageImageTransformationParams {
   fileId: string
 }
 
-// TODO not implemented yet in hasura-storage
-// export interface StorageGetPresignedUrlParams extends StorageImageTransformationParams {
-export interface StorageGetPresignedUrlParams {
+export interface StorageGetPresignedUrlParams
+  extends StorageImageTransformationParams,
+    StorageHeadersParam {
   fileId: string
 }
 
@@ -96,16 +112,9 @@ export interface FileResponse {
   uploadedByUserId: string
 }
 
-export interface ApiUploadParams {
-  formData: FormData
-  id?: string
-  name?: string
-  bucketId?: string
-}
-
 // TODO not implemented yet in hasura-storage
 // export interface ApiGetPresignedUrlParams extends StorageImageTransformationParams {
-export interface ApiGetPresignedUrlParams {
+export interface ApiGetPresignedUrlParams extends StorageHeadersParam {
   fileId: string
 }
 
@@ -113,7 +122,7 @@ export type ApiGetPresignedUrlResponse =
   | { presignedUrl: { url: string; expiration: number }; error: null }
   | { presignedUrl: null; error: Error }
 
-export interface ApiDeleteParams {
+export interface ApiDeleteParams extends StorageHeadersParam {
   fileId: string
 }
 

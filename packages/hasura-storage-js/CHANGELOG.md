@@ -1,5 +1,162 @@
 # @nhost/hasura-storage-js
 
+## 2.7.0
+
+### Minor Changes
+
+- 5c6ff6e: fix: correct StorageErrorPayload TypeScript typing
+
+## 2.6.0
+
+### Minor Changes
+
+- 4148964: fix: stack overflow on storage client getHeaders method call
+
+## 2.5.1
+
+### Patch Changes
+
+- 8512a7f: fix: fix types StorageGetUrlParams and StorageGetPresignedUrlParams to include missing StorageHeadersParam
+
+## 2.5.0
+
+### Minor Changes
+
+- 304065a: feat: add `setHeaders` method enabling global configuration of storage, graphql, and functions client headers, alongside added support for passing specific headers with individual calls
+
+## 2.4.0
+
+### Minor Changes
+
+- 2505b2e: fix: fix headers sent with getPresignedUrl
+
+## 2.3.0
+
+### Minor Changes
+
+- d3d1424: feat: Add support for authenticated download of files
+
+### Patch Changes
+
+- e5bab6a: chore: update dependencies
+
+## 2.2.6
+
+### Patch Changes
+
+- 8d91f71: chore: update deps and enable pnpm audit
+
+## 2.2.5
+
+### Patch Changes
+
+- 4fe4a1696: - accept FormData exported from [`form-data`](https://www.npmjs.com/package/form-data) as LegacyFormData
+  - accept native FormData available on node18 and above
+  - call native fetch available on node18 and above when running on [EdgeRuntime](https://edge-runtime.vercel.app/)
+
+## 2.2.4
+
+### Patch Changes
+
+- 83fee5446: fix(hasura-storage-js): swap fetch when running on edge runtime
+
+## 2.2.3
+
+### Patch Changes
+
+- 39de0063b: fix(hasura-storage-js): fix upload response status code check
+
+## 2.2.2
+
+### Patch Changes
+
+- 300e3f49e: fix(hasura-storage-js): fix file upload formData field
+
+## 2.2.1
+
+### Patch Changes
+
+- d54e4cdd4: fix(buckets): allow using custom buckets for upload
+
+## 2.2.0
+
+### Minor Changes
+
+- 2cdb13b3e: fix(upload): allow specifying `id` and `name` only when not using `form-data`
+
+## 2.1.6
+
+### Patch Changes
+
+- 1d04ad630: chore(deps): use `fetch-ponyfill` instead of `isomorphic-unfetch`
+
+## 2.1.5
+
+### Patch Changes
+
+- 4c00a796e: fix(upload): don't break upload in Node 18
+
+## 2.1.4
+
+### Patch Changes
+
+- aa3c62989: chore(cli): bump Nhost CLI version to v1.0
+
+## 2.1.3
+
+### Patch Changes
+
+- 7fea29a8: fix: update `types` config and fix the exposed React components
+
+## 2.1.2
+
+### Patch Changes
+
+- da03bf39: chore(build): change build target to ES2019
+
+## 2.1.1
+
+### Patch Changes
+
+- 90c60311: chore(deps): add `types` to `package.json`
+
+## 2.1.0
+
+### Minor Changes
+
+- a0e093d7: fix(exports): don't use conflicting names in exports
+
+### Patch Changes
+
+- bb8803a1: fix(presigned-url): don't alter URL when no transformation params were provided
+
+## 2.0.5
+
+### Patch Changes
+
+- 43c86fef: chore: improve presignedUrl test
+
+## 2.0.4
+
+### Patch Changes
+
+- 614f213e: fix(hasura-storage-js): allow image transformation parameters in `getPresignedUrl`
+
+## 2.0.3
+
+### Patch Changes
+
+- 889ee658: added tests
+- 850a049c: chore(deps): update docker/build-push-action action to v4
+
+## 2.0.2
+
+### Patch Changes
+
+- 4bf40995: chore(deps): bump `typescript` to `4.9.5`
+- 8bb097c9: chore(deps): bump `vitest`
+- 35d52aab: chore(deps): replace `cross-fetch` with `isomorphic-unfetch`
+
 ## 2.0.1
 
 ### Patch Changes

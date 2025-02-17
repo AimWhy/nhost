@@ -1,16 +1,16 @@
-import Form from '@/components/common/Form';
-import NavLink from '@/components/common/NavLink';
-import UnauthenticatedLayout from '@/components/layout/UnauthenticatedLayout';
-import Box from '@/ui/v2/Box';
-import Button from '@/ui/v2/Button';
-import Input, { inputClasses } from '@/ui/v2/Input';
-import Text from '@/ui/v2/Text';
-import { getToastStyleProps } from '@/utils/settings/settingsConstants';
+import { NavLink } from '@/components/common/NavLink';
+import { Form } from '@/components/form/Form';
+import { UnauthenticatedLayout } from '@/components/layout/UnauthenticatedLayout';
+import { Box } from '@/components/ui/v2/Box';
+import { Button } from '@/components/ui/v2/Button';
+import { Input, inputClasses } from '@/components/ui/v2/Input';
+import { Text } from '@/components/ui/v2/Text';
+import { getToastStyleProps } from '@/utils/constants/settings';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { styled } from '@mui/material';
-import { useSignInEmailPassword } from '@nhost/nextjs';
-import type { ReactElement } from 'react';
-import { useEffect } from 'react';
+import { useNhostClient, useSignInEmailPassword } from '@nhost/nextjs';
+import { useRouter } from 'next/router';
+import { useEffect, type ReactElement } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import * as Yup from 'yup';
@@ -30,6 +30,8 @@ const StyledInput = styled(Input)({
 });
 
 export default function EmailSignUpPage() {
+  const router = useRouter();
+  const nhost = useNhostClient();
   const { signInEmailPassword, error } = useSignInEmailPassword();
 
   const form = useForm<EmailSignUpFormValues>({
@@ -56,7 +58,15 @@ export default function EmailSignUpPage() {
 
   async function handleSubmit({ email, password }: EmailSignUpFormValues) {
     try {
-      await signInEmailPassword(email, password);
+      const { needsEmailVerification } = await signInEmailPassword(
+        email,
+        password,
+      );
+
+      if (needsEmailVerification) {
+        await nhost.auth.sendVerificationEmail({ email: email as string });
+        router.push(`/email/verify?email=${email}`);
+      }
     } catch {
       toast.error(
         'An error occurred while signing in. Please try again.',
@@ -113,7 +123,7 @@ export default function EmailSignUpPage() {
             />
 
             <NavLink
-              href="/reset-password"
+              href="/password/new"
               color="white"
               className="justify-self-start font-semibold"
             >

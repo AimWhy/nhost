@@ -1,7 +1,6 @@
-import PlusCircleIcon from '@/ui/v2/icons/PlusCircleIcon';
-import PlusIcon from '@/ui/v2/icons/PlusIcon';
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
-
+import { PlusCircleIcon } from '@/components/ui/v2/icons/PlusCircleIcon';
+import { PlusIcon } from '@/components/ui/v2/icons/PlusIcon';
+import type { Meta, StoryFn } from '@storybook/react';
 import type { ButtonProps } from './Button';
 import Button from './Button';
 
@@ -25,9 +24,9 @@ export default {
       control: { type: 'radio' },
     },
   },
-} as ComponentMeta<typeof Button>;
+} as Meta<typeof Button>;
 
-const Template: ComponentStory<typeof Button> = function Template(
+const Template: StoryFn<ButtonProps> = function TemplateFunction(
   args: ButtonProps,
 ) {
   return <Button {...args} />;

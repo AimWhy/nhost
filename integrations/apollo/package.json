@@ -1,6 +1,6 @@
 {
   "name": "@nhost/apollo",
-  "version": "5.0.5",
+  "version": "8.0.4",
   "description": "Nhost Apollo Client library",
   "license": "MIT",
   "keywords": [
@@ -34,6 +34,7 @@
     "./package.json": "./package.json",
     ".": {
       "import": {
+        "types": "./dist/index.d.ts",
         "node": "./dist/index.cjs.js",
         "default": "./dist/index.esm.js"
       },
@@ -59,15 +60,16 @@
     "verify:fix": "run-p prettier:fix lint:fix"
   },
   "peerDependencies": {
-    "@nhost/nhost-js": "workspace:*",
-    "@apollo/client": "^3.6.2"
+    "@apollo/client": "^3.7.10",
+    "@nhost/nhost-js": "workspace:*"
   },
   "dependencies": {
-    "graphql": "16.6.0",
-    "graphql-ws": "^5.10.1"
+    "graphql": "16.8.1",
+    "graphql-ws": "^5.16.0",
+    "jwt-decode": "^4.0.0"
   },
   "devDependencies": {
-    "@nhost/nhost-js": "workspace:*",
-    "@apollo/client": "^3.7.3"
+    "@apollo/client": "^3.9.9",
+    "@nhost/nhost-js": "workspace:*"
   }
 }

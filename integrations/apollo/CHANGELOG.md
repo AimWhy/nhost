@@ -1,5 +1,416 @@
 # @nhost/apollo
 
+## 8.0.4
+
+### Patch Changes
+
+- @nhost/nhost-js@3.2.4
+
+## 8.0.3
+
+### Patch Changes
+
+- @nhost/nhost-js@3.2.3
+
+## 8.0.2
+
+### Patch Changes
+
+- @nhost/nhost-js@3.2.2
+
+## 8.0.1
+
+### Patch Changes
+
+- @nhost/nhost-js@3.2.1
+
+## 8.0.0
+
+### Patch Changes
+
+- Updated dependencies [72899a6]
+  - @nhost/nhost-js@3.2.0
+
+## 7.1.7
+
+### Patch Changes
+
+- @nhost/nhost-js@3.1.10
+
+## 7.1.6
+
+### Patch Changes
+
+- @nhost/nhost-js@3.1.9
+
+## 7.1.5
+
+### Patch Changes
+
+- @nhost/nhost-js@3.1.8
+
+## 7.1.4
+
+### Patch Changes
+
+- @nhost/nhost-js@3.1.7
+
+## 7.1.3
+
+### Patch Changes
+
+- @nhost/nhost-js@3.1.6
+
+## 7.1.2
+
+### Patch Changes
+
+- @nhost/nhost-js@3.1.5
+
+## 7.1.1
+
+### Patch Changes
+
+- @nhost/nhost-js@3.1.4
+
+## 7.1.0
+
+### Minor Changes
+
+- d0c9f4c: fix: replace `jose` with `jwt-decode` version 4.0.0
+
+### Patch Changes
+
+- @nhost/nhost-js@3.1.3
+
+## 7.0.2
+
+### Patch Changes
+
+- Updated dependencies [4c35171]
+- Updated dependencies [3cea460]
+  - @nhost/nhost-js@3.1.2
+
+## 7.0.1
+
+### Patch Changes
+
+- @nhost/nhost-js@3.1.1
+
+## 7.0.0
+
+### Patch Changes
+
+- Updated dependencies [304065a]
+  - @nhost/nhost-js@3.1.0
+
+## 6.2.1
+
+### Patch Changes
+
+- @nhost/nhost-js@3.0.11
+
+## 6.2.0
+
+### Minor Changes
+
+- 768ca17: chore: update dependencies
+
+### Patch Changes
+
+- @nhost/nhost-js@3.0.10
+
+## 6.1.2
+
+### Patch Changes
+
+- @nhost/nhost-js@3.0.10
+
+## 6.1.1
+
+### Patch Changes
+
+- @nhost/nhost-js@3.0.9
+
+## 6.1.0
+
+### Minor Changes
+
+- 49a80c2: chore: update dependencies
+
+### Patch Changes
+
+- @nhost/nhost-js@3.0.8
+
+## 6.0.8
+
+### Patch Changes
+
+- @nhost/nhost-js@3.0.8
+
+## 6.0.7
+
+### Patch Changes
+
+- @nhost/nhost-js@3.0.7
+
+## 6.0.6
+
+### Patch Changes
+
+- e0ab6d9: fix: add extra logic to check and wait for a valid JWT
+  - @nhost/nhost-js@3.0.6
+
+## 6.0.5
+
+### Patch Changes
+
+- @nhost/nhost-js@3.0.5
+
+## 6.0.4
+
+### Patch Changes
+
+- @nhost/nhost-js@3.0.4
+
+## 6.0.3
+
+### Patch Changes
+
+- e5bab6a: chore: update dependencies
+  - @nhost/nhost-js@3.0.3
+
+## 6.0.2
+
+### Patch Changes
+
+- 8d91f71: chore: update deps and enable pnpm audit
+- Updated dependencies [8d91f71]
+  - @nhost/nhost-js@3.0.2
+
+## 6.0.1
+
+### Patch Changes
+
+- @nhost/nhost-js@3.0.1
+
+## 6.0.0
+
+### Patch Changes
+
+- Updated dependencies [bc9eff6e4]
+  - @nhost/nhost-js@3.0.0
+
+## 5.2.22
+
+### Patch Changes
+
+- Updated dependencies [8b127fbb6]
+  - @nhost/nhost-js@2.2.18
+
+## 5.2.21
+
+### Patch Changes
+
+- f777a3380: fix: apollo-integration: correctly reset accessToken to null after sign-out
+
+## 5.2.20
+
+### Patch Changes
+
+- 7459a9413: fix: apollo-integration: reset accessToken to null after sign-out
+
+## 5.2.19
+
+### Patch Changes
+
+- @nhost/nhost-js@2.2.17
+
+## 5.2.18
+
+### Patch Changes
+
+- @nhost/nhost-js@2.2.16
+
+## 5.2.17
+
+### Patch Changes
+
+- @nhost/nhost-js@2.2.15
+
+## 5.2.16
+
+### Patch Changes
+
+- @nhost/nhost-js@2.2.14
+
+## 5.2.15
+
+### Patch Changes
+
+- @nhost/nhost-js@2.2.13
+
+## 5.2.14
+
+### Patch Changes
+
+- @nhost/nhost-js@2.2.12
+
+## 5.2.13
+
+### Patch Changes
+
+- @nhost/nhost-js@2.2.11
+
+## 5.2.12
+
+### Patch Changes
+
+- 07a45fde0: chore(deps): bump `graphql` to `v16.7.1`
+- Updated dependencies [07a45fde0]
+  - @nhost/nhost-js@2.2.10
+
+## 5.2.11
+
+### Patch Changes
+
+- Updated dependencies [5a4e237a2]
+  - @nhost/nhost-js@2.2.9
+
+## 5.2.10
+
+### Patch Changes
+
+- @nhost/nhost-js@2.2.8
+
+## 5.2.9
+
+### Patch Changes
+
+- @nhost/nhost-js@2.2.7
+
+## 5.2.8
+
+### Patch Changes
+
+- Updated dependencies [aa3c62989]
+  - @nhost/nhost-js@2.2.6
+
+## 5.2.7
+
+### Patch Changes
+
+- 7fea29a8: fix: update `types` config and fix the exposed React components
+- Updated dependencies [7fea29a8]
+  - @nhost/nhost-js@2.2.5
+
+## 5.2.6
+
+### Patch Changes
+
+- @nhost/nhost-js@2.2.4
+
+## 5.2.5
+
+### Patch Changes
+
+- da03bf39: chore(build): change build target to ES2019
+- Updated dependencies [da03bf39]
+  - @nhost/nhost-js@2.2.3
+
+## 5.2.4
+
+### Patch Changes
+
+- 90c60311: chore(deps): add `types` to `package.json`
+- Updated dependencies [90c60311]
+  - @nhost/nhost-js@2.2.2
+
+## 5.2.3
+
+### Patch Changes
+
+- 117398f5: Adds async headers that waits for valid token before establishing connection to backend.
+
+## 5.2.2
+
+### Patch Changes
+
+- a1c7b00e: chore(links): add support for `generateLinks`
+- Updated dependencies [08e70b9d]
+  - @nhost/nhost-js@2.2.1
+
+## 5.2.1
+
+### Patch Changes
+
+- 0d73e87a: fix(ws): don't open unnecessary connections
+- 0d73e87a: fix(ws): increase retry attempts and implement exponential backoff
+
+## 5.2.0
+
+### Patch Changes
+
+- Updated dependencies [a0e093d7]
+  - @nhost/nhost-js@2.2.0
+
+## 5.1.3
+
+### Patch Changes
+
+- @nhost/nhost-js@2.1.2
+
+## 5.1.2
+
+### Patch Changes
+
+- 912ed76c: fix(apollo): retry subscriptions on error
+
+## 5.1.1
+
+### Patch Changes
+
+- @nhost/nhost-js@2.1.1
+
+## 5.1.0
+
+### Patch Changes
+
+- Updated dependencies [bfb4c1a6]
+  - @nhost/nhost-js@2.1.0
+
+## 5.0.9
+
+### Patch Changes
+
+- Updated dependencies [088584e7]
+  - @nhost/nhost-js@2.0.9
+
+## 5.0.8
+
+### Patch Changes
+
+- Updated dependencies [1d155559]
+  - @nhost/nhost-js@2.0.8
+
+## 5.0.7
+
+### Patch Changes
+
+- 850a049c: chore(deps): update docker/build-push-action action to v4
+- Updated dependencies [850a049c]
+  - @nhost/nhost-js@2.0.7
+
+## 5.0.6
+
+### Patch Changes
+
+- 4bf40995: chore(deps): bump `typescript` to `4.9.5`
+- Updated dependencies [4bf40995]
+- Updated dependencies [8bb097c9]
+- Updated dependencies [35d52aab]
+  - @nhost/nhost-js@2.0.6
+
 ## 5.0.5
 
 ### Patch Changes

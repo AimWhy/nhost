@@ -67,6 +67,11 @@ export type SignInWithProviderParams =
   | { provider: Exclude<Provider, 'workos'>; options?: CommonProviderOptions }
   | { provider: 'workos'; options?: WorkOsOptions }
 
+export type ConnectProviderParams = SignInWithProviderParams
+
+export type LinkIdTokenParams = { provider: Provider; idToken: string; nonce?: string }
+export type SignInIdTokenParams = { provider: Provider; idToken: string; nonce?: string }
+
 export type SignInParams =
   | SignInEmailPasswordParams
   | SignInEmailPasswordOtpParams
@@ -117,6 +122,8 @@ export type AuthChangedFunction = (event: AuthChangeEvent, session: NhostSession
 export type OnTokenChangedFunction = (session: NhostSession | null) => void
 
 export interface AuthOptions {
+  /** Unique key used for inter-tab communication to synchronize authentication state. */
+  broadcastKey?: string
   /** Time interval until token refreshes, in seconds */
   refreshIntervalTime?: number
   /**
@@ -126,15 +133,65 @@ export interface AuthOptions {
   /** Object where the refresh token will be persisted and read locally.
    *
    * Recommended values:
+   *
    * - `'web'` and `'cookies'`: no value is required
-   * - `'react-native'`: `import Storage from @react-native-async-storage/async-storage`
-   * - `'cookies'`: `localStorage`
+   * - `'react-native'`: use [@react-native-async-storage/async-storage](https://www.npmjs.com/package/@react-native-async-storage/async-storage)
+   *   ```ts
+   *   import { NhostClient } from '@nhost/nhost-js'
+   *   import AsyncStorage from '@react-native-async-storage/async-storage';
+   *   const nhost = new NhostClient({
+   *     ...
+   *     clientStorageType: 'react-native',
+   *     clientStorage: AsyncStorage
+   *   })
+   *   ```
    * - `'custom'`: an object that defines the following methods:
-   *     - `setItem` or `setItemAsync`
-   *     - `getItem` or `getItemAsync`
-   *     - `removeItem`
-   * - `'capacitor'`: `import { Storage } from @capacitor/storage`
-   * - `'expo-secure-store'`: `import * as SecureStore from 'expo-secure-store'`
+   *   - `setItem` or `setItemAsync`
+   *   - `getItem` or `getItemAsync`
+   *   - `removeItem`
+   * - `'capacitor'`:
+   *
+   *   - capacitor version **< 4** : use [@capacitor/storage](https://www.npmjs.com/package/@capacitor/storage)
+   *
+   *   ```ts
+   *   import { NhostClient } from '@nhost/nhost-js'
+   *   import { Storage } from '@capacitor/storage'
+   *   const nhost = new NhostClient({
+   *     ...
+   *     clientStorageType: 'capacitor',
+   *     clientStorage: Storage
+   *   })
+   *   ```
+   *
+   *   - capacitor version **>= 4** : use [@capacitor/preferences](https://www.npmjs.com/package/@capacitor/preferences)
+   *
+   *   ```ts
+   *   import { NhostClient  } from '@nhost/nhost-js';
+   *   import { Preferences } from '@capacitor/preferences';
+   *   const nhost = new NhostClient({
+   *     ...
+   *     clientStorageType: 'custom',
+   *     clientStorage: {
+   *       setItemAsync: async (key, value) => Preferences.set({ key, value }),
+   *       getItemAsync: async (key) => {
+   *         const { value } = await Preferences.get({ key });
+   *         return value;
+   *       },
+   *       removeItem: (key) => Preferences.remove({ key })
+   *     },
+   *   });
+   *   ```
+   *
+   * - `'expo-secure-store'`: use [expo-secure-store](https://www.npmjs.com/package/expo-secure-store)
+   *   ```ts
+   *     import { NhostClient } from '@nhost/nhost-js'
+   *     import * as SecureStore from 'expo-secure-store';
+   *     const nhost = new NhostClient({
+   *       ...
+   *       clientStorageType: 'expo-secure-store',
+   *       clientStorage: SecureStore
+   *     })
+   *   ```
    */
   clientStorage?: ClientStorage
   /**

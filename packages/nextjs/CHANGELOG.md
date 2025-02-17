@@ -1,5 +1,422 @@
 # @nhost/nextjs
 
+## 2.2.3
+
+### Patch Changes
+
+- Updated dependencies [cb63233]
+  - @nhost/react@3.10.0
+
+## 2.2.2
+
+### Patch Changes
+
+- @nhost/react@3.9.1
+
+## 2.2.1
+
+### Patch Changes
+
+- Updated dependencies [04d2ce1]
+  - @nhost/react@3.9.0
+
+## 2.2.0
+
+### Minor Changes
+
+- 46fc520: chore: add support to next.js 15, update quickstart template commands in docs
+- 29d27e1: chore: update `next` to v14.2.22 to fix vulnerabilities
+
+### Patch Changes
+
+- @nhost/react@3.8.1
+
+## 2.1.24
+
+### Patch Changes
+
+- Updated dependencies [14e6100]
+  - @nhost/react@3.8.0
+
+## 2.1.23
+
+### Patch Changes
+
+- Updated dependencies [fe6e8e2]
+  - @nhost/react@3.7.0
+
+## 2.1.22
+
+### Patch Changes
+
+- Updated dependencies [55d8bb5]
+  - @nhost/react@3.6.0
+
+## 2.1.21
+
+### Patch Changes
+
+- 52a38fe: chore: update dependencies to address security vulnerabilities
+
+## 2.1.20
+
+### Patch Changes
+
+- @nhost/react@3.5.6
+
+## 2.1.19
+
+### Patch Changes
+
+- @nhost/react@3.5.5
+
+## 2.1.18
+
+### Patch Changes
+
+- @nhost/react@3.5.4
+
+## 2.1.17
+
+### Patch Changes
+
+- @nhost/react@3.5.3
+
+## 2.1.16
+
+### Patch Changes
+
+- @nhost/react@3.5.2
+
+## 2.1.15
+
+### Patch Changes
+
+- @nhost/react@3.5.1
+
+## 2.1.14
+
+### Patch Changes
+
+- Updated dependencies [d0c9f4c]
+  - @nhost/react@3.5.0
+
+## 2.1.13
+
+### Patch Changes
+
+- @nhost/react@3.4.4
+
+## 2.1.12
+
+### Patch Changes
+
+- @nhost/react@3.4.3
+
+## 2.1.11
+
+### Patch Changes
+
+- @nhost/react@3.4.2
+
+## 2.1.10
+
+### Patch Changes
+
+- @nhost/react@3.4.1
+
+## 2.1.9
+
+### Patch Changes
+
+- Updated dependencies [768ca17]
+  - @nhost/react@3.4.0
+
+## 2.1.8
+
+### Patch Changes
+
+- Updated dependencies [311374e]
+  - @nhost/react@3.3.2
+
+## 2.1.7
+
+### Patch Changes
+
+- @nhost/react@3.3.1
+
+## 2.1.6
+
+### Patch Changes
+
+- Updated dependencies [49a80c2]
+  - @nhost/react@3.3.0
+
+## 2.1.5
+
+### Patch Changes
+
+- @nhost/react@3.2.3
+
+## 2.1.4
+
+### Patch Changes
+
+- @nhost/react@3.2.2
+
+## 2.1.3
+
+### Patch Changes
+
+- @nhost/react@3.2.1
+
+## 2.1.2
+
+### Patch Changes
+
+- Updated dependencies [017f1a6]
+  - @nhost/react@3.2.0
+
+## 2.1.1
+
+### Patch Changes
+
+- @nhost/react@3.1.1
+
+## 2.1.0
+
+### Minor Changes
+
+- b19ffed: chore: update peerDependency to support nextjs 14
+
+### Patch Changes
+
+- e5bab6a: chore: update dependencies
+- Updated dependencies [1a61c65]
+- Updated dependencies [e5bab6a]
+  - @nhost/react@3.1.0
+
+## 2.0.2
+
+### Patch Changes
+
+- 8d91f71: chore: update deps and enable pnpm audit
+- Updated dependencies [8d91f71]
+  - @nhost/react@3.0.2
+
+## 2.0.1
+
+### Patch Changes
+
+- @nhost/react@3.0.1
+
+## 2.0.0
+
+### Major Changes
+
+- bc9eff6e4: chore: remove support for using backendUrl when instantiating the Nhost client
+
+### Patch Changes
+
+- Updated dependencies [bc9eff6e4]
+  - @nhost/react@3.0.0
+
+## 1.13.40
+
+### Patch Changes
+
+- @nhost/react@2.1.1
+
+## 1.13.39
+
+### Patch Changes
+
+- Updated dependencies [00c363f80]
+- Updated dependencies [66c3193bc]
+  - @nhost/react@2.1.0
+
+## 1.13.38
+
+### Patch Changes
+
+- Updated dependencies [4fe4a1696]
+  - @nhost/react@2.0.32
+
+## 1.13.37
+
+### Patch Changes
+
+- @nhost/react@2.0.31
+
+## 1.13.36
+
+### Patch Changes
+
+- @nhost/react@2.0.30
+
+## 1.13.35
+
+### Patch Changes
+
+- @nhost/react@2.0.29
+
+## 1.13.34
+
+### Patch Changes
+
+- @nhost/react@2.0.28
+
+## 1.13.33
+
+### Patch Changes
+
+- @nhost/react@2.0.27
+
+## 1.13.32
+
+### Patch Changes
+
+- @nhost/react@2.0.26
+
+## 1.13.31
+
+### Patch Changes
+
+- Updated dependencies [b3b64a3b7]
+  - @nhost/react@2.0.25
+
+## 1.13.30
+
+### Patch Changes
+
+- @nhost/react@2.0.24
+
+## 1.13.29
+
+### Patch Changes
+
+- @nhost/react@2.0.23
+
+## 1.13.28
+
+### Patch Changes
+
+- @nhost/react@2.0.22
+
+## 1.13.27
+
+### Patch Changes
+
+- @nhost/react@2.0.21
+
+## 1.13.26
+
+### Patch Changes
+
+- @nhost/react@2.0.20
+
+## 1.13.25
+
+### Patch Changes
+
+- 7fea29a8: fix: update `types` config and fix the exposed React components
+- Updated dependencies [203bc97f]
+- Updated dependencies [7fea29a8]
+  - @nhost/react@2.0.19
+
+## 1.13.24
+
+### Patch Changes
+
+- @nhost/react@2.0.18
+
+## 1.13.23
+
+### Patch Changes
+
+- da03bf39: chore(build): change build target to ES2019
+- Updated dependencies [da03bf39]
+  - @nhost/react@2.0.17
+
+## 1.13.22
+
+### Patch Changes
+
+- 90c60311: chore(deps): add `types` to `package.json`
+- Updated dependencies [90c60311]
+  - @nhost/react@2.0.16
+
+## 1.13.21
+
+### Patch Changes
+
+- @nhost/react@2.0.15
+
+## 1.13.20
+
+### Patch Changes
+
+- Updated dependencies [43b1b144]
+  - @nhost/react@2.0.14
+
+## 1.13.19
+
+### Patch Changes
+
+- @nhost/react@2.0.13
+
+## 1.13.18
+
+### Patch Changes
+
+- @nhost/react@2.0.12
+
+## 1.13.17
+
+### Patch Changes
+
+- @nhost/react@2.0.11
+
+## 1.13.16
+
+### Patch Changes
+
+- ce1ee40d: fix(nextjs): allow `subdomain`, `region` and service URLs
+  - @nhost/react@2.0.10
+
+## 1.13.15
+
+### Patch Changes
+
+- f375eacc: fix(nextjs): accept service URLs
+- Updated dependencies [f375eacc]
+  - @nhost/react@2.0.9
+
+## 1.13.14
+
+### Patch Changes
+
+- @nhost/react@2.0.8
+
+## 1.13.13
+
+### Patch Changes
+
+- 850a049c: chore(deps): update docker/build-push-action action to v4
+- Updated dependencies [850a049c]
+  - @nhost/react@2.0.7
+
+## 1.13.12
+
+### Patch Changes
+
+- 4bf40995: chore(deps): bump `typescript` to `4.9.5`
+- 8bb097c9: chore(deps): bump `vitest`
+- 35d52aab: chore(deps): replace `cross-fetch` with `isomorphic-unfetch`
+- Updated dependencies [4bf40995]
+- Updated dependencies [8bb097c9]
+  - @nhost/react@2.0.6
+
 ## 1.13.11
 
 ### Patch Changes

@@ -1,5 +1,4 @@
-import { PropsWithChildren } from 'react'
-
+import { Fragment, PropsWithChildren, createElement } from 'react'
 import { useAuthenticationStatus } from '../useAuthenticationStatus'
 
 /**
@@ -7,7 +6,7 @@ import { useAuthenticationStatus } from '../useAuthenticationStatus'
  *
  * @example
  * ```tsx
- * import { NhostProvider, SignedOut } from "@nhost/react";
+ * import { NhostProvider, SignedIn } from "@nhost/react";
  * import { nhost } from '@/utils/nhost';
  *
  * function Page() {
@@ -32,5 +31,5 @@ export function SignedIn({ children }: PropsWithChildren<unknown>) {
     return null
   }
 
-  return <>{children}</>
+  return createElement(Fragment, null, children)
 }

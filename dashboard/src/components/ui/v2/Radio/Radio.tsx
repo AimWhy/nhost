@@ -1,12 +1,13 @@
-import type { FormControlLabelProps } from '@/ui/v2/FormControlLabel';
-import FormControlLabel, {
+import type { FormControlLabelProps } from '@/components/ui/v2/FormControlLabel';
+import {
+  FormControlLabel,
   formControlLabelClasses,
-} from '@/ui/v2/FormControlLabel';
-import SvgIcon from '@/ui/v2/icons/SvgIcon';
+} from '@/components/ui/v2/FormControlLabel';
+import { SvgIcon } from '@/components/ui/v2/icons/SvgIcon';
 import { styled } from '@mui/material';
 import type { RadioProps as MaterialRadioProps } from '@mui/material/Radio';
 import MaterialRadio from '@mui/material/Radio';
-import type { ForwardedRef, PropsWithoutRef } from 'react';
+import type { ForwardedRef, PropsWithoutRef, ReactNode } from 'react';
 import { forwardRef } from 'react';
 
 export interface RadioProps extends MaterialRadioProps {
@@ -17,7 +18,7 @@ export interface RadioProps extends MaterialRadioProps {
   /**
    * Label to be displayed next to the radio button.
    */
-  label?: string;
+  label?: ReactNode;
   /**
    * Props to be passed to individual component slots.
    */

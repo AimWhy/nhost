@@ -1,7 +1,7 @@
-import RetryableErrorBoundary from '@/components/common/RetryableErrorBoundary';
-import AlertDialog from '@/ui/v2/AlertDialog';
-import { BaseDialog } from '@/ui/v2/Dialog';
-import Drawer from '@/ui/v2/Drawer';
+import { RetryableErrorBoundary } from '@/components/presentational/RetryableErrorBoundary';
+import { AlertDialog } from '@/components/ui/v2/AlertDialog';
+import { BaseDialog } from '@/components/ui/v2/Dialog';
+import { Drawer } from '@/components/ui/v2/Drawer';
 import { useRouter } from 'next/router';
 import type { BaseSyntheticEvent, PropsWithChildren } from 'react';
 import {
@@ -258,6 +258,7 @@ function DialogProvider({ children }: PropsWithChildren<unknown>) {
           className: twMerge(
             'max-w-md w-full',
             dialogProps?.PaperProps?.className,
+            'z-30',
           ),
         }}
       >
@@ -288,10 +289,11 @@ function DialogProvider({ children }: PropsWithChildren<unknown>) {
         open={drawerOpen}
         onClose={closeDrawerWithDirtyGuard}
         SlideProps={{ onExited: clearDrawerContent, unmountOnExit: false }}
+        className="z-40"
         PaperProps={{
           ...drawerProps?.PaperProps,
           className: twMerge(
-            'max-w-2.5xl w-full',
+            'max-w-4xl w-full',
             drawerProps?.PaperProps?.className,
           ),
         }}

@@ -35,6 +35,8 @@ export interface RedirectOption {
 
 export interface PasswordlessOptions extends RegistrationOptions, RedirectOption {}
 export interface SignUpOptions extends RegistrationOptions, RedirectOption {}
+export interface EmailOTPOptions extends RegistrationOptions, RedirectOption {}
+
 export interface SignUpSecurityKeyOptions extends SignUpOptions {
   /** Optional nickname for the security key */
   nickname?: string
@@ -48,10 +50,17 @@ export interface DeanonymizeOptions extends RegistrationOptions {
   password?: string
 }
 
-export interface CommonProviderOptions extends RegistrationOptions, RedirectOption {}
+export interface CommonProviderOptions extends RegistrationOptions, RedirectOption {
+  connect?: boolean
+}
 export interface WorkOsOptions extends CommonProviderOptions {
   connection?: string
   organization?: string
   provider?: string
 }
 export interface ProviderOptions extends CommonProviderOptions, WorkOsOptions {}
+
+export interface RequestOptions {
+  // optional extra headers to be sent with request (ex: x-cf-turnstile-response)
+  headers?: Record<string, string>
+}

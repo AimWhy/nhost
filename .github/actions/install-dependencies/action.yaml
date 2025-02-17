@@ -12,26 +12,24 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - uses: pnpm/action-setup@v2.2.4
+    - uses: pnpm/action-setup@v4
       with:
-        version: 7.17.0
+        version: 10.1.0
         run_install: false
     - name: Get pnpm cache directory
       id: pnpm-cache-dir
       shell: bash
       run: echo "dir=$(pnpm store path)" >> $GITHUB_OUTPUT
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       id: pnpm-cache
       with:
-        path: |
-          ${{ steps.pnpm-cache-dir.outputs.dir }}
-          ~/.cache/Cypress
+        path: ${{ steps.pnpm-cache-dir.outputs.dir }}
         key: ${{ runner.os }}-node-${{ hashFiles('pnpm-lock.yaml') }}
         restore-keys: ${{ runner.os }}-node-
-    - name: Use Node.js 16
+    - name: Use Node.js v20
       uses: actions/setup-node@v3
       with:
-        node-version: 16
+        node-version: 20
     - shell: bash
       name: Install packages
       run: pnpm install --frozen-lockfile

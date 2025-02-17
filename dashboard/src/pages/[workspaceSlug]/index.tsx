@@ -1,26 +1,22 @@
-import { LoadingScreen } from '@/components/common/LoadingScreen';
-import AuthenticatedLayout from '@/components/layout/AuthenticatedLayout';
-import Container from '@/components/layout/Container';
-import {
-  WorkspaceApps,
-  WorkspaceHeader,
-  WorkspaceMembers,
-} from '@/components/workspace';
-import { WorkspaceInvoices } from '@/components/workspace/WorkspaceInvoices';
-import WorkspacePaymentMethods from '@/components/workspace/WorkspacePaymentMethods';
-import { useCurrentWorkspaceAndApplication } from '@/hooks/useCurrentWorkspaceAndApplication';
-import { useGetAllUserWorkspacesAndApplications } from '@/hooks/useGetAllUserWorkspacesAndApplications';
-import useNotFoundRedirect from '@/hooks/useNotFoundRedirect';
+import { Container } from '@/components/layout/Container';
+import { LoadingScreen } from '@/components/presentational/LoadingScreen';
+import { ProjectLayout } from '@/features/orgs/layout/ProjectLayout';
+import { useCurrentWorkspaceAndProject } from '@/features/projects/common/hooks/useCurrentWorkspaceAndProject';
+import { useNotFoundRedirect } from '@/features/projects/common/hooks/useNotFoundRedirect';
+import { WorkspaceApps } from '@/features/projects/workspaces/components/WorkspaceApps';
+import { WorkspaceHeader } from '@/features/projects/workspaces/components/WorkspaceHeader';
+import { WorkspaceInvoices } from '@/features/projects/workspaces/components/WorkspaceInvoices';
+import { WorkspaceMembers } from '@/features/projects/workspaces/components/WorkspaceMembers';
+import { WorkspacePaymentMethods } from '@/features/projects/workspaces/components/WorkspacePaymentMethods';
 import { NextSeo } from 'next-seo';
 import type { ReactElement } from 'react';
 
 export default function WorkspaceDetailsPage() {
-  const { currentWorkspace } = useCurrentWorkspaceAndApplication();
+  const { currentWorkspace, loading } = useCurrentWorkspaceAndProject();
 
-  useGetAllUserWorkspacesAndApplications(false);
   useNotFoundRedirect();
 
-  if (!currentWorkspace) {
+  if (!currentWorkspace || loading) {
     return <LoadingScreen />;
   }
 
@@ -37,5 +33,5 @@ export default function WorkspaceDetailsPage() {
 }
 
 WorkspaceDetailsPage.getLayout = function getLayout(page: ReactElement) {
-  return <AuthenticatedLayout>{page}</AuthenticatedLayout>;
+  return <ProjectLayout>{page}</ProjectLayout>;
 };

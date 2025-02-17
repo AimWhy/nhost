@@ -1,17 +1,19 @@
-import Form from '@/components/common/Form';
-import NavLink from '@/components/common/NavLink';
-import GithubIcon from '@/components/icons/GithubIcon';
-import UnauthenticatedLayout from '@/components/layout/UnauthenticatedLayout';
-import Box from '@/ui/v2/Box';
-import Button from '@/ui/v2/Button';
-import Divider from '@/ui/v2/Divider';
-import Input, { inputClasses } from '@/ui/v2/Input';
-import Text from '@/ui/v2/Text';
+import { NavLink } from '@/components/common/NavLink';
+import { Form } from '@/components/form/Form';
+import { UnauthenticatedLayout } from '@/components/layout/UnauthenticatedLayout';
+import { Box } from '@/components/ui/v2/Box';
+import { Button } from '@/components/ui/v2/Button';
+import { Divider } from '@/components/ui/v2/Divider';
+import { GitHubIcon } from '@/components/ui/v2/icons/GitHubIcon';
+import { Input, inputClasses } from '@/components/ui/v2/Input';
+import { Text } from '@/components/ui/v2/Text';
+import { getToastStyleProps } from '@/utils/constants/settings';
 import { nhost } from '@/utils/nhost';
-import { getToastStyleProps } from '@/utils/settings/settingsConstants';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Turnstile } from '@marsidev/react-turnstile';
 import { styled } from '@mui/material';
 import { useSignUpEmailPassword } from '@nhost/nextjs';
+import { useRouter } from 'next/router';
 import type { ReactElement } from 'react';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -36,6 +38,10 @@ const StyledInput = styled(Input)({
 export default function SignUpPage() {
   const { signUpEmailPassword, error } = useSignUpEmailPassword();
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  // x-cf-turnstile-response
+  const [turnstileResponse, setTurnstileResponse] = useState(null);
 
   const form = useForm<SignUpFormValues>({
     reValidateMode: 'onSubmit',
@@ -64,8 +70,32 @@ export default function SignUpPage() {
     password,
     displayName,
   }: SignUpFormValues) {
+    if (!turnstileResponse) {
+      toast.error(
+        'Please complete the signup verification challenge to continue.',
+        getToastStyleProps(),
+      );
+
+      return;
+    }
+
     try {
-      await signUpEmailPassword(email, password, { displayName });
+      const { needsEmailVerification } = await signUpEmailPassword(
+        email,
+        password,
+        {
+          displayName,
+        },
+        {
+          headers: {
+            'x-cf-turnstile-response': turnstileResponse,
+          },
+        },
+      );
+
+      if (needsEmailVerification) {
+        router.push(`/email/verify?email=${email}`);
+      }
     } catch {
       toast.error(
         'An error occurred while signing up. Please try again.',
@@ -88,7 +118,7 @@ export default function SignUpPage() {
         <Button
           variant="borderless"
           className="!bg-white !text-black hover:ring-2 hover:ring-white hover:ring-opacity-50 disabled:!text-black disabled:!text-opacity-60"
-          startIcon={<GithubIcon />}
+          startIcon={<GitHubIcon />}
           disabled={loading}
           loading={loading}
           size="large"
@@ -160,6 +190,12 @@ export default function SignUpPage() {
               inputProps={{ min: 2, max: 128 }}
               error={!!formState.errors.password}
               helperText={formState.errors.password?.message}
+            />
+
+            <Turnstile
+              siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+              options={{ theme: 'dark', size: 'flexible' }}
+              onSuccess={setTurnstileResponse}
             />
 
             <Button

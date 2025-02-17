@@ -1,18 +1,21 @@
 import { load } from 'cheerio'
-import fetch from 'cross-fetch'
+import fetchPonyfill from 'fetch-ponyfill'
 import createMailhogClient from 'mailhog'
 import { expect } from 'vitest'
 import { HasuraAuthClient, SignUpParams } from '../src'
 
-const AUTH_BACKEND_URL = 'http://localhost:1337/v1/auth'
+const { fetch } = fetchPonyfill()
+
+const AUTH_BACKEND_URL = 'https://local.auth.local.nhost.run/v1'
 
 const auth = new HasuraAuthClient({
   url: AUTH_BACKEND_URL
 })
 
 const mailhog = createMailhogClient({
-  host: '127.0.0.1',
-  port: 8025
+  host: 'local.mailhog.nhost.run',
+  protocol: 'https:',
+  port: 443
 })
 
 export { auth, mailhog }

@@ -1,5 +1,444 @@
 # @nhost/nhost-js
 
+## 3.2.4
+
+### Patch Changes
+
+- Updated dependencies [5c6ff6e]
+  - @nhost/hasura-storage-js@2.7.0
+
+## 3.2.3
+
+### Patch Changes
+
+- Updated dependencies [44c1e17]
+- Updated dependencies [04d2ce1]
+  - @nhost/hasura-auth-js@2.10.0
+
+## 3.2.2
+
+### Patch Changes
+
+- Updated dependencies [b944d05]
+- Updated dependencies [4148964]
+  - @nhost/hasura-auth-js@2.9.0
+  - @nhost/hasura-storage-js@2.6.0
+
+## 3.2.1
+
+### Patch Changes
+
+- Updated dependencies [14e6100]
+  - @nhost/hasura-auth-js@2.8.0
+
+## 3.2.0
+
+### Minor Changes
+
+- 72899a6: fix: use a unique `broadcastKey` per nhost client for synchronizing authentication state across browser tabs
+
+### Patch Changes
+
+- Updated dependencies [fe6e8e2]
+- Updated dependencies [72899a6]
+  - @nhost/hasura-auth-js@2.7.0
+
+## 3.1.10
+
+### Patch Changes
+
+- Updated dependencies [55d8bb5]
+  - @nhost/hasura-auth-js@2.6.0
+
+## 3.1.9
+
+### Patch Changes
+
+- Updated dependencies [8b12426]
+  - @nhost/hasura-auth-js@2.5.6
+
+## 3.1.8
+
+### Patch Changes
+
+- Updated dependencies [caa8bd7]
+  - @nhost/hasura-auth-js@2.5.5
+
+## 3.1.7
+
+### Patch Changes
+
+- Updated dependencies [4564232]
+  - @nhost/hasura-auth-js@2.5.4
+
+## 3.1.6
+
+### Patch Changes
+
+- Updated dependencies [e28975d]
+  - @nhost/hasura-auth-js@2.5.3
+
+## 3.1.5
+
+### Patch Changes
+
+- Updated dependencies [a03fb2c]
+  - @nhost/hasura-auth-js@2.5.2
+
+## 3.1.4
+
+### Patch Changes
+
+- Updated dependencies [f4f0353]
+- Updated dependencies [defffd8]
+  - @nhost/hasura-auth-js@2.5.1
+
+## 3.1.3
+
+### Patch Changes
+
+- Updated dependencies [d0c9f4c]
+  - @nhost/hasura-auth-js@2.5.0
+  - @nhost/graphql-js@0.3.0
+
+## 3.1.2
+
+### Patch Changes
+
+- 4c35171: fix: update docstring to correctly reflect usage of nhost.unsetRole method
+- 3cea460: chore: update docs links for nhost-js setRole and unsetRole methods
+
+## 3.1.1
+
+### Patch Changes
+
+- Updated dependencies [8512a7f]
+  - @nhost/hasura-storage-js@2.5.1
+
+## 3.1.0
+
+### Minor Changes
+
+- 304065a: feat: add `setHeaders` method enabling global configuration of storage, graphql, and functions client headers, alongside added support for passing specific headers with individual calls
+
+### Patch Changes
+
+- Updated dependencies [68e0622]
+- Updated dependencies [304065a]
+  - @nhost/hasura-auth-js@2.4.2
+  - @nhost/hasura-storage-js@2.5.0
+  - @nhost/graphql-js@0.2.0
+
+## 3.0.11
+
+### Patch Changes
+
+- Updated dependencies [bcd889b]
+  - @nhost/hasura-auth-js@2.4.1
+
+## 3.0.10
+
+### Patch Changes
+
+- Updated dependencies [1623e9b]
+- Updated dependencies [311374e]
+  - @nhost/hasura-auth-js@2.4.0
+
+## 3.0.9
+
+### Patch Changes
+
+- Updated dependencies [7789469]
+  - @nhost/graphql-js@0.1.9
+
+## 3.0.8
+
+### Patch Changes
+
+- Updated dependencies [407feea]
+  - @nhost/graphql-js@0.1.8
+
+## 3.0.7
+
+### Patch Changes
+
+- Updated dependencies [2d68fee]
+  - @nhost/graphql-js@0.1.7
+
+## 3.0.6
+
+### Patch Changes
+
+- Updated dependencies [7baee8a]
+- Updated dependencies [e0ab6d9]
+  - @nhost/hasura-auth-js@2.3.1
+  - @nhost/graphql-js@0.1.6
+
+## 3.0.5
+
+### Patch Changes
+
+- Updated dependencies [017f1a6]
+  - @nhost/hasura-auth-js@2.3.0
+
+## 3.0.4
+
+### Patch Changes
+
+- Updated dependencies [2505b2e]
+  - @nhost/hasura-storage-js@2.4.0
+
+## 3.0.3
+
+### Patch Changes
+
+- Updated dependencies [1a61c65]
+- Updated dependencies [e5bab6a]
+- Updated dependencies [d3d1424]
+  - @nhost/hasura-auth-js@2.2.0
+  - @nhost/hasura-storage-js@2.3.0
+  - @nhost/graphql-js@0.1.5
+
+## 3.0.2
+
+### Patch Changes
+
+- 8d91f71: chore: update deps and enable pnpm audit
+- Updated dependencies [8d91f71]
+  - @nhost/hasura-storage-js@2.2.6
+  - @nhost/hasura-auth-js@2.1.11
+  - @nhost/graphql-js@0.1.5
+
+## 3.0.1
+
+### Patch Changes
+
+- Updated dependencies [b338793d6]
+  - @nhost/hasura-auth-js@2.1.10
+
+## 3.0.0
+
+### Major Changes
+
+- bc9eff6e4: chore: remove support for using backendUrl when instantiating the Nhost client
+
+## 2.2.18
+
+### Patch Changes
+
+- 8b127fbb6: feat: export `urlFromSubdomain` helper
+
+## 2.2.17
+
+### Patch Changes
+
+- Updated dependencies [4fe4a1696]
+- Updated dependencies [4fe4a1696]
+  - @nhost/hasura-auth-js@2.1.9
+  - @nhost/hasura-storage-js@2.2.5
+
+## 2.2.16
+
+### Patch Changes
+
+- Updated dependencies [83fee5446]
+  - @nhost/hasura-storage-js@2.2.4
+
+## 2.2.15
+
+### Patch Changes
+
+- Updated dependencies [032c0bd21]
+  - @nhost/hasura-auth-js@2.1.8
+
+## 2.2.14
+
+### Patch Changes
+
+- Updated dependencies [39de0063b]
+  - @nhost/hasura-storage-js@2.2.3
+
+## 2.2.13
+
+### Patch Changes
+
+- Updated dependencies [300e3f49e]
+  - @nhost/hasura-storage-js@2.2.2
+
+## 2.2.12
+
+### Patch Changes
+
+- Updated dependencies [d54e4cdd4]
+  - @nhost/hasura-storage-js@2.2.1
+
+## 2.2.11
+
+### Patch Changes
+
+- Updated dependencies [2cdb13b3e]
+  - @nhost/hasura-storage-js@2.2.0
+
+## 2.2.10
+
+### Patch Changes
+
+- 07a45fde0: chore(deps): bump `graphql` to `v16.7.1`
+- Updated dependencies [07a45fde0]
+  - @nhost/graphql-js@0.1.4
+
+## 2.2.9
+
+### Patch Changes
+
+- 5a4e237a2: fix(deps): pass access token to clients on sign in
+- Updated dependencies [1d04ad630]
+- Updated dependencies [7e973d568]
+  - @nhost/hasura-auth-js@2.1.7
+  - @nhost/hasura-storage-js@2.1.6
+
+## 2.2.8
+
+### Patch Changes
+
+- Updated dependencies [28a305d9b]
+  - @nhost/hasura-auth-js@2.1.6
+
+## 2.2.7
+
+### Patch Changes
+
+- Updated dependencies [4c00a796e]
+  - @nhost/hasura-storage-js@2.1.5
+
+## 2.2.6
+
+### Patch Changes
+
+- aa3c62989: chore(cli): bump Nhost CLI version to v1.0
+- Updated dependencies [aa3c62989]
+  - @nhost/hasura-auth-js@2.1.5
+  - @nhost/hasura-storage-js@2.1.4
+
+## 2.2.5
+
+### Patch Changes
+
+- 7fea29a8: fix: update `types` config and fix the exposed React components
+- Updated dependencies [203bc97f]
+- Updated dependencies [7fea29a8]
+  - @nhost/hasura-auth-js@2.1.4
+  - @nhost/graphql-js@0.1.3
+  - @nhost/hasura-storage-js@2.1.3
+
+## 2.2.4
+
+### Patch Changes
+
+- Updated dependencies [0d6fc421]
+  - @nhost/hasura-auth-js@2.1.3
+
+## 2.2.3
+
+### Patch Changes
+
+- da03bf39: chore(build): change build target to ES2019
+- Updated dependencies [da03bf39]
+  - @nhost/graphql-js@0.1.2
+  - @nhost/hasura-auth-js@2.1.2
+  - @nhost/hasura-storage-js@2.1.2
+
+## 2.2.2
+
+### Patch Changes
+
+- 90c60311: chore(deps): add `types` to `package.json`
+- Updated dependencies [90c60311]
+  - @nhost/graphql-js@0.1.1
+  - @nhost/hasura-auth-js@2.1.1
+  - @nhost/hasura-storage-js@2.1.1
+
+## 2.2.1
+
+### Patch Changes
+
+- 08e70b9d: fix(functions): show more detailed error messages
+
+## 2.2.0
+
+### Minor Changes
+
+- a0e093d7: fix(exports): don't use conflicting names in exports
+
+### Patch Changes
+
+- Updated dependencies [bb8803a1]
+- Updated dependencies [a0e093d7]
+  - @nhost/hasura-storage-js@2.1.0
+  - @nhost/hasura-auth-js@2.1.0
+
+## 2.1.2
+
+### Patch Changes
+
+- Updated dependencies [43c86fef]
+  - @nhost/hasura-storage-js@2.0.5
+
+## 2.1.1
+
+### Patch Changes
+
+- Updated dependencies [614f213e]
+  - @nhost/hasura-storage-js@2.0.4
+
+## 2.1.0
+
+### Minor Changes
+
+- bfb4c1a6: chore(sdk): remove deprecated `useAxios` property
+
+### Patch Changes
+
+- Updated dependencies [bfb4c1a6]
+  - @nhost/graphql-js@0.1.0
+
+## 2.0.9
+
+### Patch Changes
+
+- 088584e7: feat(nhost-js): add support for `local` as a special subdomain
+
+## 2.0.8
+
+### Patch Changes
+
+- 1d155559: fix(nhost-js): allow `null` as body and return JSON when `content-type` is `application/json`
+
+## 2.0.7
+
+### Patch Changes
+
+- 850a049c: chore(deps): update docker/build-push-action action to v4
+- Updated dependencies [889ee658]
+- Updated dependencies [850a049c]
+  - @nhost/hasura-storage-js@2.0.3
+  - @nhost/graphql-js@0.0.5
+  - @nhost/hasura-auth-js@2.0.2
+
+## 2.0.6
+
+### Patch Changes
+
+- 4bf40995: chore(deps): bump `typescript` to `4.9.5`
+- 8bb097c9: chore(deps): bump `vitest`
+- 35d52aab: chore(deps): replace `cross-fetch` with `isomorphic-unfetch`
+- Updated dependencies [4bf40995]
+- Updated dependencies [8bb097c9]
+- Updated dependencies [35d52aab]
+  - @nhost/graphql-js@0.0.4
+  - @nhost/hasura-auth-js@2.0.1
+  - @nhost/hasura-storage-js@2.0.2
+
 ## 2.0.5
 
 ### Patch Changes

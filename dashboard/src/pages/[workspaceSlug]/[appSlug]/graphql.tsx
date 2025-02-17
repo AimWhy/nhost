@@ -1,15 +1,15 @@
-import { UserSelect } from '@/components/applications/graphql/UserSelect';
-import { DEFAULT_ROLES } from '@/components/applications/graphql/utils';
-import { LoadingScreen } from '@/components/common/LoadingScreen';
-import RetryableErrorBoundary from '@/components/common/RetryableErrorBoundary';
-import ProjectLayout from '@/components/layout/ProjectLayout';
-import { useCurrentWorkspaceAndApplication } from '@/hooks/useCurrentWorkspaceAndApplication';
-import Button from '@/ui/v2/Button';
-import PlayIcon from '@/ui/v2/icons/PlayIcon';
-import Option from '@/ui/v2/Option';
-import Select from '@/ui/v2/Select';
-import Tooltip from '@/ui/v2/Tooltip';
-import generateAppServiceUrl from '@/utils/common/generateAppServiceUrl';
+import { LoadingScreen } from '@/components/presentational/LoadingScreen';
+import { RetryableErrorBoundary } from '@/components/presentational/RetryableErrorBoundary';
+import { Button } from '@/components/ui/v2/Button';
+import { PlayIcon } from '@/components/ui/v2/icons/PlayIcon';
+import { Option } from '@/components/ui/v2/Option';
+import { Select } from '@/components/ui/v2/Select';
+import { Tooltip } from '@/components/ui/v2/Tooltip';
+import { UserSelect } from '@/features/graphql/common/components/UserSelect';
+import { DEFAULT_ROLES } from '@/features/graphql/common/utils/constants';
+import { ProjectLayout } from '@/features/orgs/layout/ProjectLayout';
+import { useCurrentWorkspaceAndProject } from '@/features/projects/common/hooks/useCurrentWorkspaceAndProject';
+import { generateAppServiceUrl } from '@/features/projects/common/utils/generateAppServiceUrl';
 import { triggerToast } from '@/utils/toast';
 import {
   DOC_EXPLORER_PLUGIN,
@@ -250,19 +250,19 @@ function GraphiQLEditor({ onHeaderChange }: GraphiQLEditorProps) {
 }
 
 export default function GraphQLPage() {
-  const { currentApplication } = useCurrentWorkspaceAndApplication();
+  const { currentProject } = useCurrentWorkspaceAndProject();
   const [userHeaders, setUserHeaders] = useState<Record<string, any>>({});
 
   if (
-    !currentApplication?.subdomain ||
-    !currentApplication?.config?.hasura.adminSecret
+    !currentProject?.subdomain ||
+    !currentProject?.config?.hasura.adminSecret
   ) {
     return <LoadingScreen />;
   }
 
   const appUrl = generateAppServiceUrl(
-    currentApplication.subdomain,
-    currentApplication.region.awsName,
+    currentProject.subdomain,
+    currentProject.region,
     'graphql',
   );
 
@@ -272,7 +272,7 @@ export default function GraphQLPage() {
 
   const headers = {
     'content-type': 'application/json',
-    'x-hasura-admin-secret': currentApplication.config?.hasura.adminSecret,
+    'x-hasura-admin-secret': currentProject.config?.hasura.adminSecret,
     ...userHeaders,
   };
 
@@ -320,7 +320,7 @@ GraphQLPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <ProjectLayout
       mainContainerProps={{
-        className: 'flex flex-col',
+        className: 'flex flex-col h-full',
         sx: {
           [`& .graphiql-container`]: {
             [`& .graphiql-main, & .graphiql-sessions`]: {

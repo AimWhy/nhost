@@ -1,32 +1,33 @@
-import { LoadingScreen } from '@/components/common/LoadingScreen';
-import RetryableErrorBoundary from '@/components/common/RetryableErrorBoundary';
-import FilesDataGrid from '@/components/files/FilesDataGrid';
-import ProjectLayout from '@/components/layout/ProjectLayout';
-import { useCurrentWorkspaceAndApplication } from '@/hooks/useCurrentWorkspaceAndApplication';
-import generateAppServiceUrl from '@/utils/common/generateAppServiceUrl';
+import { LoadingScreen } from '@/components/presentational/LoadingScreen';
+import { RetryableErrorBoundary } from '@/components/presentational/RetryableErrorBoundary';
+import { ProjectLayout } from '@/features/orgs/layout/ProjectLayout';
+import { useCurrentWorkspaceAndProject } from '@/features/projects/common/hooks/useCurrentWorkspaceAndProject';
+import { generateAppServiceUrl } from '@/features/projects/common/utils/generateAppServiceUrl';
+import { FilesDataGrid } from '@/features/storage/dataGrid/components/FilesDataGrid';
+import { getHasuraAdminSecret } from '@/utils/env';
 import { NhostApolloProvider } from '@nhost/react-apollo';
 import type { ReactElement } from 'react';
 
 export default function StoragePage() {
-  const { currentApplication } = useCurrentWorkspaceAndApplication();
+  const { currentProject, loading } = useCurrentWorkspaceAndProject();
 
-  if (!currentApplication) {
+  if (!currentProject || loading) {
     return <LoadingScreen />;
   }
 
   return (
     <NhostApolloProvider
       graphqlUrl={generateAppServiceUrl(
-        currentApplication.subdomain,
-        currentApplication.region.awsName,
+        currentProject.subdomain,
+        currentProject.region,
         'graphql',
       )}
       fetchPolicy="cache-first"
       headers={{
         'x-hasura-admin-secret':
           process.env.NEXT_PUBLIC_ENV === 'dev'
-            ? 'nhost-admin-secret'
-            : currentApplication.config?.hasura.adminSecret,
+            ? getHasuraAdminSecret()
+            : currentProject.config?.hasura.adminSecret,
       }}
     >
       <div className="h-full pb-25 xs+:pb-[53px]">

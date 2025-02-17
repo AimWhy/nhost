@@ -1,27 +1,27 @@
 import { useDialog } from '@/components/common/DialogProvider';
-import Pagination from '@/components/common/Pagination';
-import Container from '@/components/layout/Container';
-import ProjectLayout from '@/components/layout/ProjectLayout';
-import CreateUserForm from '@/components/users/CreateUserForm';
-import UsersBody from '@/components/users/UsersBody';
+import { Pagination } from '@/components/common/Pagination';
+import { Container } from '@/components/layout/Container';
+import { ActivityIndicator } from '@/components/ui/v2/ActivityIndicator';
+import { Box } from '@/components/ui/v2/Box';
+import { Button } from '@/components/ui/v2/Button';
+import { PlusIcon } from '@/components/ui/v2/icons/PlusIcon';
+import { SearchIcon } from '@/components/ui/v2/icons/SearchIcon';
+import { UserIcon } from '@/components/ui/v2/icons/UserIcon';
+import { Input } from '@/components/ui/v2/Input';
+import { Text } from '@/components/ui/v2/Text';
+import { CreateUserForm } from '@/features/authentication/users/components/CreateUserForm';
+import { UsersBody } from '@/features/authentication/users/components/UsersBody';
+import { ProjectLayout } from '@/features/orgs/layout/ProjectLayout';
 import { useRemoteApplicationGQLClient } from '@/hooks/useRemoteApplicationGQLClient';
-import ActivityIndicator from '@/ui/v2/ActivityIndicator';
-import Box from '@/ui/v2/Box';
-import Button from '@/ui/v2/Button';
-import PlusIcon from '@/ui/v2/icons/PlusIcon';
-import SearchIcon from '@/ui/v2/icons/SearchIcon';
-import UserIcon from '@/ui/v2/icons/UserIcon';
-import Input from '@/ui/v2/Input';
-import Text from '@/ui/v2/Text';
-import type { RemoteAppGetUsersQuery } from '@/utils/__generated__/graphql';
-import { useRemoteAppGetUsersQuery } from '@/utils/__generated__/graphql';
+import type { RemoteAppGetUsersAndAuthRolesQuery } from '@/utils/__generated__/graphql';
+import { useRemoteAppGetUsersAndAuthRolesQuery } from '@/utils/__generated__/graphql';
 import debounce from 'lodash.debounce';
 import Router, { useRouter } from 'next/router';
 import type { ChangeEvent, ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export type RemoteAppUser = Exclude<
-  RemoteAppGetUsersQuery['users'][0],
+  RemoteAppGetUsersAndAuthRolesQuery['users'][0],
   '__typename'
 >;
 
@@ -75,7 +75,7 @@ export default function UsersPage() {
     data: dataRemoteAppUsers,
     refetch: refetchProjectUsers,
     loading: loadingRemoteAppUsersQuery,
-  } = useRemoteAppGetUsersQuery({
+  } = useRemoteAppGetUsersAndAuthRolesQuery({
     variables: remoteAppGetUserVariables,
     client: remoteProjectGQLClient,
   });
@@ -233,7 +233,7 @@ export default function UsersPage() {
             placeholder="Search users"
             startAdornment={
               <SearchIcon
-                className="ml-2 -mr-1 h-4 w-4 shrink-0"
+                className="-mr-1 ml-2 h-4 w-4 shrink-0"
                 sx={{ color: 'text.disabled' }}
               />
             }
@@ -263,7 +263,7 @@ export default function UsersPage() {
           placeholder="Search users"
           startAdornment={
             <SearchIcon
-              className="ml-2 -mr-1 h-4 w-4 shrink-0"
+              className="-mr-1 ml-2 h-4 w-4 shrink-0"
               sx={{ color: 'text.disabled' }}
             />
           }
@@ -347,6 +347,7 @@ export default function UsersPage() {
                           .count
                       : dataRemoteAppUsers?.usersAggregate?.aggregate?.count
                   }
+                  itemsLabel="users"
                   elementsPerPage={
                     searchString
                       ? dataRemoteAppUsers?.filteredUsersAggreggate.aggregate
@@ -387,9 +388,5 @@ export default function UsersPage() {
 }
 
 UsersPage.getLayout = function getLayout(page: ReactElement) {
-  return (
-    <ProjectLayout contentContainerProps={{ className: 'h-full' }}>
-      {page}
-    </ProjectLayout>
-  );
+  return <ProjectLayout>{page}</ProjectLayout>;
 };

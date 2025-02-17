@@ -1,23 +1,20 @@
-import AppDeployments from '@/components/applications/AppDeployments';
-import RetryableErrorBoundary from '@/components/common/RetryableErrorBoundary';
-import Container from '@/components/layout/Container';
-import ProjectLayout from '@/components/layout/ProjectLayout';
-import { useUI } from '@/context/UIContext';
-import { useWorkspaceContext } from '@/context/workspace-context';
-import { useCurrentWorkspaceAndApplication } from '@/hooks/useCurrentWorkspaceAndApplication';
-import Button from '@/ui/v2/Button';
-import Text from '@/ui/v2/Text';
+import { useUI } from '@/components/common/UIProvider';
+import { Container } from '@/components/layout/Container';
+import { RetryableErrorBoundary } from '@/components/presentational/RetryableErrorBoundary';
+import { Button } from '@/components/ui/v2/Button';
+import { Text } from '@/components/ui/v2/Text';
+import { ProjectLayout } from '@/features/orgs/layout/ProjectLayout';
+import { useCurrentWorkspaceAndProject } from '@/features/projects/common/hooks/useCurrentWorkspaceAndProject';
+import { AppDeployments } from '@/features/projects/deployments/components/AppDeployments';
 import Image from 'next/image';
 import NavLink from 'next/link';
 import type { ReactElement } from 'react';
 
 export default function DeploymentsPage() {
-  const { currentWorkspace, currentApplication } =
-    useCurrentWorkspaceAndApplication();
-  const { workspaceContext } = useWorkspaceContext();
+  const { currentWorkspace, currentProject } = useCurrentWorkspaceAndProject();
   const { maintenanceActive } = useUI();
 
-  if (!workspaceContext.repository) {
+  if (!currentProject?.githubRepository) {
     return (
       <Container className="mt-12 grid max-w-3xl grid-flow-row gap-4 text-center antialiased">
         <div className="mx-auto flex w-centImage flex-col text-center">
@@ -39,8 +36,9 @@ export default function DeploymentsPage() {
         </div>
 
         <NavLink
-          href={`/${currentWorkspace.slug}/${currentApplication.slug}/settings/git`}
+          href={`/${currentWorkspace?.slug}/${currentProject?.slug}/settings/git`}
           passHref
+          legacyBehavior
         >
           <Button
             variant="borderless"
@@ -63,7 +61,7 @@ export default function DeploymentsPage() {
       </div>
 
       <RetryableErrorBoundary>
-        <AppDeployments appId={workspaceContext.appId} />
+        <AppDeployments appId={currentProject?.id} />
       </RetryableErrorBoundary>
     </Container>
   );

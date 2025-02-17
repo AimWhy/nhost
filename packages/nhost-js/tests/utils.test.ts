@@ -1,21 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { buildUrl, LOCALHOST_REGEX, urlFromSubdomain } from '../src/utils/helpers'
 
 describe('urlFromParams', () => {
-  describe('when using backendUrl', () => {
-    it('should return the full url with the path "/v1/auth" concatenated', async () => {
-      const url = urlFromSubdomain({ backendUrl: 'http://localhost' }, 'auth')
-
-      expect(url).toBe('http://localhost/v1/auth')
-    })
-
-    it('should return the full url with the path "/v1/storage" concatenated', async () => {
-      const url = urlFromSubdomain({ backendUrl: 'http://localhost:1337' }, 'storage')
-
-      expect(url).toBe('http://localhost:1337/v1/storage')
-    })
-  })
-
   describe('using subdomain', () => {
     describe('other than "localhost" and a region', () => {
       it('should return the full authentication url', async () => {
@@ -53,6 +39,38 @@ describe('urlFromParams', () => {
         const url = urlFromSubdomain({ subdomain: 'https://localhost:1337' }, 'auth')
 
         expect(url).toBe('https://localhost:1337/v1/auth')
+      })
+    })
+
+    describe('"local" without a custom port', () => {
+      it('should return the full authentication url', async () => {
+        const url = urlFromSubdomain({ subdomain: 'local' }, 'auth')
+
+        expect(url).toBe('https://local.auth.local.nhost.run/v1')
+      })
+
+      it('should return the full storage url', async () => {
+        const url = urlFromSubdomain({ subdomain: 'local' }, 'storage')
+
+        expect(url).toBe('https://local.storage.local.nhost.run/v1')
+      })
+
+      it('should return the full GraphQL url', async () => {
+        const url = urlFromSubdomain({ subdomain: 'local' }, 'graphql')
+
+        expect(url).toBe('https://local.graphql.local.nhost.run/v1')
+      })
+
+      it('should return the full functions url', async () => {
+        const url = urlFromSubdomain({ subdomain: 'local' }, 'functions')
+
+        expect(url).toBe('https://local.functions.local.nhost.run/v1')
+      })
+
+      it('should return the full Hasura url', async () => {
+        const url = urlFromSubdomain({ subdomain: 'local' }, 'hasura')
+
+        expect(url).toBe('https://local.hasura.local.nhost.run/v1')
       })
     })
 
@@ -108,7 +126,9 @@ describe('buildUrl', () => {
   })
 
   it('should handle missing parameters', () => {
+    // @ts-ignore
     expect(() => buildUrl()).toThrow()
+    // @ts-ignore
     expect(() => buildUrl('https://example.com')).toThrow()
   })
 })

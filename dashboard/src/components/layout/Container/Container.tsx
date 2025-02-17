@@ -1,5 +1,5 @@
-import type { BoxProps } from '@/ui/v2/Box';
-import Box from '@/ui/v2/Box';
+import type { BoxProps } from '@/components/ui/v2/Box';
+import { Box } from '@/components/ui/v2/Box';
 import { twMerge } from 'tailwind-merge';
 
 export interface ContainerProps extends BoxProps {
@@ -16,9 +16,9 @@ export default function Container({
   ...props
 }: ContainerProps) {
   return (
-    <Box className={twMerge('mx-auto w-full', rootClassName)}>
+    <Box className={twMerge('mx-auto w-full', rootClassName)} {...props}>
       <Box
-        className={twMerge('mx-auto max-w-7xl px-5 pt-6 pb-20', className)}
+        className={twMerge('mx-auto max-w-7xl px-5 py-4', className)}
         {...props}
       >
         {children}

@@ -1,17 +1,35 @@
 import { NhostAuthConstructorParams } from '@nhost/hasura-auth-js'
+
 // TODO shared with other packages
-export type ErrorPayload = {
+export interface ErrorPayload<TMessage = any> {
   error: string
   status: number
-  message: string
+  message: TMessage
 }
 
-export type BackendUrl = {
+// TODO shared with other packages
+export interface ActionErrorState {
   /**
-   * Nhost backend URL
-   * Will be deprecated in a future release. Please look at 'subdomain' and 'region' instead.
+   * @return `true` if an error occurred
+   * @depreacted use `!isSuccess` or `!!error` instead
+   * */
+  isError: boolean
+  /** Provides details about the error */
+  error: ErrorPayload | null
+}
+
+// TODO shared with other packages
+export interface ActionLoadingState {
+  /**
+   * @return `true` when the action is executing, `false` when it finished its execution.
    */
-  backendUrl: string
+  isLoading: boolean
+}
+
+// TODO shared with other packages
+export interface ActionSuccessState {
+  /** Returns `true` if the action is successful. */
+  isSuccess: boolean
 }
 
 export type Subdomain = {
@@ -40,13 +58,10 @@ export type ServiceUrls = {
   functionsUrl?: string
 }
 
-export type BackendOrSubdomain = BackendUrl | Subdomain
-
 export interface NhostClientConstructorParams
-  extends Partial<BackendUrl>,
-    Partial<Subdomain>,
+  extends Partial<Subdomain>,
     Partial<ServiceUrls>,
-    Omit<NhostAuthConstructorParams, 'url'> {
+    Omit<NhostAuthConstructorParams, 'url' | 'broadcastKey'> {
   /**
    * When set, the admin secret is sent as a header, `x-hasura-admin-secret`,
    * for all requests to GraphQL, Storage, and Serverless Functions.

@@ -11,10 +11,10 @@ export interface NhostFunctionsConstructorParams {
   adminSecret?: string
 }
 
-export type NhostFunctionCallResponse<T = unknown> =
+export type NhostFunctionCallResponse<TData = unknown, TErrorMessage = any> =
   | {
       res: {
-        data: T
+        data: TData
         status: number
         statusText: string
       }
@@ -22,12 +22,10 @@ export type NhostFunctionCallResponse<T = unknown> =
     }
   | {
       res: null
-      error: ErrorPayload
+      error: ErrorPayload<TErrorMessage>
     }
 
 /** Subset of RequestInit parameters that are supported by the functions client */
 export interface NhostFunctionCallConfig {
   headers?: Record<string, string>
-  /** @deprecated Axios has been replaced by cross-fetch. You should now remove this option. */
-  useAxios?: false
 }

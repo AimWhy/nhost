@@ -1,10 +1,8 @@
-import fs from 'fs'
-import { describe, expect, it } from 'vitest'
-import fetch from 'cross-fetch'
-import { v4 as uuidv4 } from 'uuid'
-
-import { storage } from './utils/helpers'
 import FormData from 'form-data'
+import fs from 'fs'
+import { v4 as uuidv4 } from 'uuid'
+import { describe, expect, it } from 'vitest'
+import { storage } from './utils/helpers'
 
 describe('test get file', () => {
   it('should be able to get uploaded file', async () => {
@@ -16,8 +14,17 @@ describe('test get file', () => {
     })
     expect(error).toBeNull()
 
+    if (!fileMetadata) {
+      throw new Error('fileMetadata is missing')
+    }
+
+    const fileId =
+      'processedFiles' in fileMetadata
+        ? fileMetadata.processedFiles[0]?.id
+        : (fileMetadata.id as string)
+
     const url = storage.getPublicUrl({
-      fileId: fileMetadata?.id as string
+      fileId
     })
 
     expect(url).toBeTruthy()

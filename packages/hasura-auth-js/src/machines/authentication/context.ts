@@ -1,4 +1,4 @@
-import { ErrorPayload, User } from '../../types'
+import { AuthErrorPayload, User } from '../../types'
 
 export type StateErrorTypes = 'registration' | 'authentication' | 'signout'
 
@@ -10,6 +10,7 @@ export type AuthContext = {
   accessToken: {
     value: string | null
     expiresAt: Date | null
+    expiresInSeconds: number | null
   }
   refreshTimer: {
     startedAt: Date | null
@@ -18,10 +19,11 @@ export type AuthContext = {
   }
   refreshToken: {
     value: string | null
+    isPAT?: boolean
   }
   /** Number of times the user tried to get an access token from a refresh token but got a network error */
   importTokenAttempts: number
-  errors: Partial<Record<StateErrorTypes, ErrorPayload>>
+  errors: Partial<Record<StateErrorTypes, AuthErrorPayload>>
 }
 
 export const INITIAL_MACHINE_CONTEXT: AuthContext = {
@@ -29,7 +31,8 @@ export const INITIAL_MACHINE_CONTEXT: AuthContext = {
   mfa: null,
   accessToken: {
     value: null,
-    expiresAt: null
+    expiresAt: null,
+    expiresInSeconds: 15
   },
   refreshTimer: {
     startedAt: null,

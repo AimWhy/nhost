@@ -1,5 +1,5 @@
 import { TypedDocumentNode } from '@graphql-typed-document-node/core'
-import fetch from 'cross-fetch'
+import fetch from 'isomorphic-unfetch'
 import { parseRequestArgs } from './parse-args'
 import { resolveRequestDocument } from './resolve-request-document'
 import {
@@ -12,6 +12,8 @@ import {
   Variables
 } from './types'
 
+import { jwtDecode, JwtPayload } from 'jwt-decode'
+
 /**
  * @alias GraphQL
  */
@@ -19,6 +21,7 @@ export class NhostGraphqlClient {
   readonly _url: string
   private accessToken: string | null
   private adminSecret?: string
+  private headers: Record<string, string> = {}
 
   constructor(params: NhostGraphqlConstructorParams) {
     const { url, adminSecret } = params
@@ -26,6 +29,37 @@ export class NhostGraphqlClient {
     this._url = url
     this.accessToken = null
     this.adminSecret = adminSecret
+  }
+
+  private isAccessTokenValidOrNull = () => {
+    if (!this.accessToken) {
+      return true
+    }
+
+    try {
+      const decodedToken = jwtDecode(this.accessToken) as JwtPayload
+      return decodedToken.exp != null && decodedToken.exp * 1000 > Date.now()
+    } catch (error) {
+      console.error('Error decoding token:', error)
+      return false
+    }
+  }
+
+  private awaitForValidAccessTokenOrNull = async () => {
+    if (this.isAccessTokenValidOrNull()) {
+      return true
+    }
+
+    const waitForValidTokenOrNull = () => {
+      if (this.isAccessTokenValidOrNull()) {
+        return Promise.resolve(true)
+      }
+      return new Promise((resolve) => {
+        setTimeout(() => waitForValidTokenOrNull().then(resolve), 100)
+      })
+    }
+
+    return waitForValidTokenOrNull()
   }
 
   /**
@@ -68,8 +102,14 @@ export class NhostGraphqlClient {
     const [variables, config] = variablesAndRequestHeaders
     const requestOptions = parseRequestArgs(documentOrOptions, variables, config)
 
-    const { headers, ...otherOptions } = config || {}
+    const { headers: extraHeaders, ...otherOptions } = config || {}
     const { query, operationName } = resolveRequestDocument(requestOptions.document)
+
+    if (typeof process !== 'undefined' && !process.env.TEST_MODE) {
+      // We skip this while running unit tests because the accessToken is generated using faker
+      await this.awaitForValidAccessTokenOrNull()
+    }
+
     try {
       const response = await fetch(this.httpUrl, {
         method: 'POST',
@@ -81,7 +121,8 @@ export class NhostGraphqlClient {
         headers: {
           'Content-Type': 'application/json',
           ...this.generateAccessTokenHeaders(),
-          ...headers
+          ...this.headers, // graphql client headers to be sent with all `request` calls
+          ...extraHeaders // extra headers to be sent with a specific call
         },
         ...otherOptions
       })
@@ -187,6 +228,61 @@ export class NhostGraphqlClient {
     }
 
     this.accessToken = accessToken
+  }
+
+  /**
+   * Use `nhost.graphql.getHeaders` to get the global headers sent with all graphql requests
+   *
+   * @example
+   * ```ts
+   * nhost.graphql.getHeaders()
+   * ```
+   *
+   * @docs https://docs.nhost.io/reference/javascript/graphql/get-headers
+   */
+  getHeaders(): Record<string, string> {
+    return this.headers
+  }
+
+  /**
+   * Use `nhost.graphql.setHeaders` to set global headers to be sent in all subsequent graphql requests
+   *
+   * @example
+   * ```ts
+   * nhost.graphql.setHeaders({
+   *  'x-hasura-role': 'admin'
+   * })
+   * ```
+   *
+   * @docs https://docs.nhost.io/reference/javascript/graphql/set-headers
+   */
+  setHeaders(headers?: Record<string, string>) {
+    if (!headers) {
+      return
+    }
+
+    this.headers = {
+      ...this.headers,
+      ...headers
+    }
+  }
+
+  /**
+   * Use `nhost.graphql.unsetHeaders` to remove global headers sent with all requests, except for the role header to preserve
+   * the role set by 'setRole' method.
+   *
+   * @example
+   * ```ts
+   * nhost.graphql.unsetHeaders()
+   * ```
+   *
+   * @docs https://docs.nhost.io/reference/javascript/graphql/unset-headers
+   */
+  unsetHeaders() {
+    const userRole = this.headers['x-hasura-role']
+
+    // preserve the user role header to avoid invalidating preceding 'setRole' call.
+    this.headers = userRole ? { 'x-hasura-role': userRole } : {}
   }
 
   private generateAccessTokenHeaders(): NhostGraphqlRequestConfig['headers'] {

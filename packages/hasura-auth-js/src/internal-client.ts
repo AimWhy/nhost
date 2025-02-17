@@ -1,5 +1,11 @@
 import { interpret } from 'xstate'
-import { AuthInterpreter, AuthMachine, AuthMachineOptions, createAuthMachine } from './machines'
+import {
+  AuthContext,
+  AuthInterpreter,
+  AuthMachine,
+  AuthMachineOptions,
+  createAuthMachine
+} from './machines'
 import { NhostSession } from './types'
 import { isBrowser } from './utils'
 
@@ -29,6 +35,7 @@ export class AuthClient {
     start = true,
     backendUrl,
     clientUrl,
+    broadcastKey,
     devTools,
     ...defaultOptions
   }: NhostClientOptions) {
@@ -39,6 +46,7 @@ export class AuthClient {
       ...defaultOptions,
       backendUrl,
       clientUrl,
+      broadcastKey,
       clientStorageType,
       autoSignIn,
       autoRefreshToken
@@ -48,16 +56,32 @@ export class AuthClient {
       this.start({ devTools })
     }
 
-    if (typeof window !== 'undefined' && autoSignIn) {
+    if (typeof window !== 'undefined' && broadcastKey) {
       try {
-        // TODO listen to sign out
         // TODO the same refresh token is used and refreshed by all tabs
         // * Ideally, a single tab should autorefresh and share the new jwt
-        this._channel = new BroadcastChannel('nhost')
-        this._channel.addEventListener('message', (token) => {
-          const existingToken = this.interpreter?.getSnapshot().context.refreshToken.value
-          if (this.interpreter && token.data !== existingToken) {
-            this.interpreter.send('TRY_TOKEN', { token: token.data })
+        this._channel = new BroadcastChannel(broadcastKey)
+
+        if (autoSignIn) {
+          this._channel?.addEventListener('message', (event) => {
+            const { type, payload } = event.data
+
+            if (type === 'broadcast_token') {
+              const existingToken = this.interpreter?.getSnapshot().context.refreshToken.value
+              if (this.interpreter && payload.token && payload.token !== existingToken) {
+                this.interpreter.send('TRY_TOKEN', { token: payload.token })
+              }
+            }
+          })
+        }
+
+        this._channel.addEventListener('message', (event) => {
+          const { type } = event.data
+
+          if (type === 'signout') {
+            if (this.interpreter) {
+              this.interpreter.send('SIGNOUT')
+            }
           }
         })
       } catch (error) {
@@ -71,7 +95,17 @@ export class AuthClient {
     initialSession,
     interpreter
   }: { interpreter?: AuthInterpreter; initialSession?: NhostSession; devTools?: boolean } = {}) {
-    const context = { ...this.machine.context }
+    // Create a deep copy of the machine context to ensure that nested objects (such as accessToken and refreshToken) are not mutated in the original context.
+    const context: AuthContext = {
+      ...this.machine.context,
+      accessToken: {
+        ...this.machine.context.accessToken
+      },
+      refreshToken: {
+        ...this.machine.context.refreshToken
+      }
+    }
+
     if (initialSession) {
       context.user = initialSession.user
       context.refreshToken.value = initialSession.refreshToken ?? null
